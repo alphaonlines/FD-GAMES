@@ -8,6 +8,85 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="../common.css" />
+    <style>
+      .board {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 6px;
+        background: rgba(255, 255, 255, 0.04);
+        padding: 6px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .cell {
+        aspect-ratio: 1 / 1;
+        border-radius: 10px;
+        border: 1px dashed rgba(255, 255, 255, 0.18);
+        background: rgba(255, 255, 255, 0.02);
+        display: grid;
+        place-items: center;
+        color: var(--muted);
+        cursor: pointer;
+        transition: background 0.2s ease, border 0.2s ease, transform 0.1s ease;
+      }
+
+      .cell:hover {
+        border-color: rgba(102, 224, 255, 0.4);
+        background: rgba(102, 224, 255, 0.06);
+      }
+
+      .cell[data-correct='true'] {
+        border-color: rgba(34, 197, 94, 0.7);
+        background: rgba(34, 197, 94, 0.08);
+        color: #7ef2b8;
+      }
+
+      .palette {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-top: 0.85rem;
+      }
+
+      .piece {
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        border-radius: 10px;
+        padding: 0.55rem 0.75rem;
+        background: rgba(255, 255, 255, 0.04);
+        cursor: pointer;
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        transition: border 0.2s ease, transform 0.1s ease;
+      }
+
+      .piece.active {
+        border-color: rgba(102, 224, 255, 0.7);
+        box-shadow: 0 8px 24px rgba(102, 224, 255, 0.2);
+        transform: translateY(-1px);
+      }
+
+      .checklist {
+        display: grid;
+        gap: 0.45rem;
+      }
+
+      .checklist span {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        color: var(--muted);
+      }
+
+      .pill-small {
+        padding: 0.25rem 0.6rem;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: var(--muted);
+        font-weight: 600;
+      }
+    </style>
   </head>
   <body>
     <header>
@@ -18,7 +97,7 @@
         </div>
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
           <a class="btn secondary" href="../../index.html">Back to hub</a>
-          <button class="btn outline" data-action="reset">Reset state</button>
+          <button class="btn outline" data-action="reset">Reset</button>
         </div>
       </div>
     </header>
@@ -27,66 +106,257 @@
       <section class="hero">
         <div>
           <p class="badge">Timed design puzzle</p>
-          <h1>Beat the clock to finish the checklist.</h1>
+          <h1>Fill the room before the buzzer.</h1>
           <p>
-            Drop in snap-to-grid placement, a countdown timer, and scoring for speed, style match, and zero overlaps. Use
-            the skeleton controls to wire your puzzle loop quickly.
+            Select a piece, tap a cell, and complete the checklist before the timer drains. Each placement locks in with a
+            quick color pulse so you know it landed.
           </p>
           <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem;">
             <button class="btn" data-action="start">Start run</button>
-            <a class="btn secondary" href="../../start/room-rush/README.md">View brief</a>
+            <a class="btn secondary" href="../../start/room-rush/README.md">Readme</a>
           </div>
-          <div class="status" style="margin-top: 1rem;">
+          <div class="status" style="margin-top: 0.75rem;">
             <span class="status-indicator"></span>
-            <span data-status>Waiting for your grid.</span>
+            <div>
+              <strong data-status>Waiting to start.</strong>
+              <div class="muted" data-message>Pick a piece and tap a cell once the clock starts.</div>
+            </div>
           </div>
+          <div class="palette" data-palette></div>
         </div>
         <div class="panel">
-          <h3 class="section-title">Room canvas</h3>
-          <p class="muted">Use this space to mount a grid, drag handles, and a checklist HUD.</p>
-          <div class="placeholder-area">Grid / checklist UI placeholder.</div>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap;">
+            <div>
+              <h3 class="section-title">Room grid</h3>
+              <p class="muted" style="margin: 0;">Place each item where it belongs. Green cells mean a perfect fit.</p>
+            </div>
+            <div class="pill-small">
+              Time left: <span data-time>60s</span>
+            </div>
+          </div>
+          <div class="board" data-board></div>
+          <div class="hud" style="margin-top: 0.75rem;">
+            <div class="stat">
+              <strong>Placed</strong>
+              <span data-placed>0 / 0</span>
+            </div>
+            <div class="stat">
+              <strong>Correct</strong>
+              <span data-correct>0</span>
+            </div>
+            <div class="stat">
+              <strong>Best clear</strong>
+              <span data-best>—</span>
+            </div>
+          </div>
         </div>
       </section>
 
-      <section style="margin-top: 1.5rem;" class="subgrid">
+      <section style="margin-top: 1.25rem;" class="subgrid">
         <div class="panel">
-          <h3 class="section-title">Build checklist</h3>
-          <div class="checklist" style="display: grid; gap: 0.75rem;">
-            <label><input type="checkbox" data-check="grid" />Snap-to-grid placement for large tiles.</label>
-            <label><input type="checkbox" data-check="timer" />Countdown timer with bonus for time left.</label>
-            <label><input type="checkbox" data-check="style" />Style-match scoring (color/material tags).</label>
-          </div>
+          <h3 class="section-title">Checklist</h3>
+          <div class="checklist" data-checklist></div>
         </div>
         <div class="panel">
-          <h3 class="section-title">Design notes</h3>
-          <ul class="muted" style="line-height: 1.6; padding-left: 1.1rem;">
-            <li>Checklist drives required items per level.</li>
-            <li>Prevent overlaps and snap to nearest cell.</li>
-            <li>Daily leaderboard for best designer runs.</li>
-          </ul>
+          <h3 class="section-title">Tips</h3>
+          <p class="muted" style="line-height: 1.6;">
+            • You can re-place any item if you drop it in the wrong spot.<br />
+            • Beat your best completion time by finishing faster.<br />
+            • Use the palette to see which items are still unplaced.
+          </p>
         </div>
-        <div class="panel">
-          <h3 class="section-title">Session notes</h3>
-          <p class="muted">Fast jot for findings or tweaks. Saved locally.</p>
-          <textarea data-note rows="6" style="width: 100%; border-radius: 12px; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: var(--text);"></textarea>
-        </div>
-      </section>
-
-      <section style="margin-top: 1.5rem;" class="panel">
-        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
-          <div>
-            <h3 class="section-title">Activity log</h3>
-            <p class="muted" style="margin: 0;">Start/reset clicks appear here for quick debugging.</p>
-          </div>
-          <a class="btn secondary" href="../../README.md">Repo notes</a>
-        </div>
-        <ul class="log" data-log style="margin-top: 0.75rem;"></ul>
       </section>
     </main>
 
-    <script src="../common.js"></script>
     <script>
-      initGameSkeleton({ slug: 'room-rush', title: 'Room Rush', defaultStatus: 'Grid ready soon.' });
+      const objectives = [
+        { id: 'sofa', label: 'Sofa + throw', icon: '🛋️', cell: '1,1' },
+        { id: 'rug', label: 'Rug', icon: '🪄', cell: '2,1' },
+        { id: 'lamp', label: 'Floor lamp', icon: '💡', cell: '0,3' },
+        { id: 'art', label: 'Wall art', icon: '🖼️', cell: '0,1' },
+        { id: 'plant', label: 'Plant', icon: '🪴', cell: '2,3' },
+        { id: 'table', label: 'Coffee table', icon: '🧊', cell: '2,2' },
+      ];
+
+      const palette = document.querySelector('[data-palette]');
+      const board = document.querySelector('[data-board]');
+      const checklist = document.querySelector('[data-checklist]');
+      const statusEl = document.querySelector('[data-status]');
+      const messageEl = document.querySelector('[data-message]');
+      const timeEl = document.querySelector('[data-time]');
+      const placedEl = document.querySelector('[data-placed]');
+      const correctEl = document.querySelector('[data-correct]');
+      const bestEl = document.querySelector('[data-best]');
+      const startBtn = document.querySelector('[data-action="start"]');
+      const resetBtn = document.querySelector('[data-action="reset"]');
+
+      const boardSize = 4;
+      const placements = new Map();
+      const bestKey = 'fd-room-rush-best';
+      let selected = null;
+      let timer = null;
+      let timeLeft = 60;
+      let running = false;
+      let startTime = 0;
+      let bestTime = Number(localStorage.getItem(bestKey) || 0);
+
+      const cellKey = (row, col) => `${row},${col}`;
+
+      const renderBoard = () => {
+        board.innerHTML = '';
+        for (let row = 0; row < boardSize; row += 1) {
+          for (let col = 0; col < boardSize; col += 1) {
+            const cell = document.createElement('button');
+            cell.className = 'cell';
+            cell.dataset.position = cellKey(row, col);
+            cell.addEventListener('click', () => handleCellClick(cell));
+            board.appendChild(cell);
+          }
+        }
+      };
+
+      const renderChecklist = () => {
+        checklist.innerHTML = '';
+        objectives.forEach((objective) => {
+          const item = document.createElement('div');
+          item.innerHTML = `<span>${objective.icon} ${objective.label}</span>`;
+          item.dataset.id = objective.id;
+          checklist.appendChild(item);
+        });
+        placedEl.textContent = `0 / ${objectives.length}`;
+        correctEl.textContent = '0';
+        bestEl.textContent = bestTime ? `${bestTime}s` : '—';
+      };
+
+      const setStatus = (text, sub) => {
+        statusEl.textContent = text;
+        messageEl.textContent = sub || '';
+      };
+
+      const updatePalette = () => {
+        palette.innerHTML = '';
+        objectives.forEach((objective) => {
+          const btn = document.createElement('button');
+          btn.className = 'piece';
+          btn.dataset.id = objective.id;
+          btn.innerHTML = `${objective.icon} ${objective.label}`;
+          if (selected === objective.id) btn.classList.add('active');
+          btn.addEventListener('click', () => {
+            selected = objective.id;
+            updatePalette();
+          });
+          palette.appendChild(btn);
+        });
+      };
+
+      const updateChecklist = () => {
+        const correct = objectives.filter((obj) => placements.get(obj.cell) === obj.id).length;
+        const placed = placements.size;
+        placedEl.textContent = `${placed} / ${objectives.length}`;
+        correctEl.textContent = `${correct}`;
+
+        checklist.querySelectorAll('div').forEach((item) => {
+          const matched = placements.get(objectives.find((o) => o.id === item.dataset.id).cell) === item.dataset.id;
+          item.style.color = matched ? '#7ef2b8' : 'var(--muted)';
+        });
+
+        board.querySelectorAll('.cell').forEach((cell) => {
+          const pos = cell.dataset.position;
+          const match = placements.get(pos);
+          const expected = objectives.find((o) => o.cell === pos);
+          cell.dataset.correct = match && expected && match === expected.id ? 'true' : 'false';
+        });
+
+        if (correct === objectives.length) {
+          finishRun(true);
+        }
+      };
+
+      const handleCellClick = (cell) => {
+        if (!running) {
+          setStatus('Tap Start to play.', 'The timer begins once you start a run.');
+          return;
+        }
+        if (!selected) {
+          setStatus('Select a piece first.', 'Pick an item from the palette.');
+          return;
+        }
+        const pos = cell.dataset.position;
+        placements.set(pos, selected);
+        cell.textContent = objectives.find((o) => o.id === selected)?.icon || selected;
+        cell.style.transform = 'scale(0.98)';
+        setTimeout(() => {
+          cell.style.transform = 'scale(1)';
+        }, 100);
+        updateChecklist();
+      };
+
+      const tick = () => {
+        timeLeft -= 1;
+        if (timeLeft <= 0) {
+          timeLeft = 0;
+          finishRun(false);
+        }
+        timeEl.textContent = `${timeLeft}s`;
+      };
+
+      const finishRun = (success) => {
+        if (!running) return;
+        running = false;
+        clearInterval(timer);
+        const duration = Math.max(0, Math.round((Date.now() - startTime) / 1000));
+        if (success) {
+          setStatus('Checklist complete!', `Finished in ${duration}s.`);
+          if (!bestTime || duration < bestTime) {
+            bestTime = duration;
+            localStorage.setItem(bestKey, String(bestTime));
+          }
+        } else {
+          setStatus('Time up.', 'Reset and try again.');
+        }
+        timeEl.textContent = `${timeLeft}s`;
+        bestEl.textContent = bestTime ? `${bestTime}s` : '—';
+      };
+
+      const startRun = () => {
+        running = true;
+        placements.clear();
+        board.querySelectorAll('.cell').forEach((cell) => {
+          cell.textContent = '';
+          cell.dataset.correct = 'false';
+        });
+        timeLeft = 60;
+        startTime = Date.now();
+        clearInterval(timer);
+        timer = setInterval(tick, 1000);
+        setStatus('Run started.', 'Place every item where it belongs.');
+        timeEl.textContent = `${timeLeft}s`;
+        updateChecklist();
+      };
+
+      const reset = () => {
+        running = false;
+        clearInterval(timer);
+        placements.clear();
+        selected = null;
+        timeLeft = 60;
+        startTime = 0;
+        renderBoard();
+        renderChecklist();
+        updatePalette();
+        setStatus('Waiting to start.', 'Pick a piece and tap a cell once the clock starts.');
+      };
+
+      startBtn.addEventListener('click', startRun);
+      resetBtn.addEventListener('click', () => {
+        localStorage.removeItem(bestKey);
+        bestTime = 0;
+        reset();
+      });
+
+      renderBoard();
+      renderChecklist();
+      updatePalette();
     </script>
   </body>
 </html>
