@@ -4,20 +4,69 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Couch Stack | FD Games</title>
-    <link
-      rel="preconnect"
-      href="https://fonts.googleapis.com"
-    />
-    <link
-      rel="preconnect"
-      href="https://fonts.gstatic.com"
-      crossorigin
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="../common.css" />
+    <style>
+      canvas {
+        width: 100%;
+        max-width: 640px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: radial-gradient(circle at 30% 20%, rgba(102, 224, 255, 0.08), transparent 40%),
+          radial-gradient(circle at 70% 80%, rgba(249, 168, 38, 0.08), transparent 35%),
+          linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(0, 0, 0, 0.25)),
+          #0a1127;
+      }
+
+      .hud {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 0.75rem;
+        margin-top: 0.75rem;
+      }
+
+      .stat {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 0.75rem 0.9rem;
+        display: grid;
+        gap: 0.2rem;
+      }
+
+      .stat span {
+        color: var(--muted);
+      }
+
+      .controls {
+        display: flex;
+        gap: 0.6rem;
+        flex-wrap: wrap;
+        margin-top: 0.75rem;
+      }
+
+      .legend {
+        display: grid;
+        gap: 0.4rem;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .status-banner {
+        margin-top: 0.75rem;
+        padding: 0.9rem 1rem;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .log {
+        max-height: 200px;
+        overflow: auto;
+      }
+    </style>
   </head>
   <body>
     <header>
@@ -26,9 +75,9 @@
           <span class="brand">FD Games</span>
           <span class="pill">Couch Stack</span>
         </div>
-        <div class="nav-right" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <div class="controls" style="margin-top: 0;">
           <a class="btn secondary" href="../../index.html">Back to hub</a>
-          <button class="btn outline" data-action="reset">Reset state</button>
+          <button class="btn outline" data-action="reset">Reset</button>
         </div>
       </div>
     </header>
@@ -37,66 +86,252 @@
       <section class="hero">
         <div>
           <p class="badge">Balance / Placement</p>
-          <h1>Stack FD silhouettes without tipping.</h1>
+          <h1>Stack the couches before the tower tips.</h1>
           <p>
-            Drag-and-drop furniture silhouettes onto a moving platform. This skeleton gives you the structure for timers,
-            scoring, and placement validation—drop in your own drag logic when ready.
+            Time each drop as the platform glides back and forth. The tighter you align the block with the one below it, the
+            more material you keep for the next layer. Miss the overlap and the run ends.
           </p>
-          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem;">
-            <button class="btn" data-action="start">Start prototype</button>
-            <a class="btn secondary" href="../../start/couch-stack/README.md">View brief</a>
+          <div class="controls">
+            <button class="btn" data-action="start">Start run</button>
+            <button class="btn secondary" data-action="drop">Drop couch</button>
+            <a class="btn secondary" href="../../start/couch-stack/README.md">Readme</a>
           </div>
-          <div class="status" style="margin-top: 1rem;">
-            <span class="status-indicator"></span>
-            <span data-status>Ready to prototype.</span>
+          <div class="status-banner">
+            <strong>Status:</strong> <span data-status>Waiting to start.</span>
+            <div class="muted" data-message style="margin-top: 0.35rem;">Tap the canvas or hit space to drop.</div>
           </div>
         </div>
-        <div class="panel">
-          <h3 class="section-title">Round status</h3>
-          <p class="muted">Use this placeholder to show timer, score, and stability meter.</p>
-          <div class="placeholder-area">Canvas/board goes here.</div>
+        <div class="panel" style="text-align: center;">
+          <canvas id="stackCanvas" width="640" height="420"></canvas>
+          <div class="hud">
+            <div class="stat">
+              <strong>Height</strong>
+              <span data-height>0 blocks</span>
+            </div>
+            <div class="stat">
+              <strong>Best height</strong>
+              <span data-best>0 blocks</span>
+            </div>
+            <div class="stat">
+              <strong>Last drop</strong>
+              <span data-last>—</span>
+            </div>
+          </div>
         </div>
       </section>
 
-      <section style="margin-top: 1.5rem;" class="subgrid">
+      <section style="margin-top: 1.25rem;" class="subgrid">
         <div class="panel">
-          <h3 class="section-title">Build checklist</h3>
-          <div class="checklist" style="display: grid; gap: 0.75rem;">
-            <label><input type="checkbox" data-check="drag-drop" />Add drag/drop physics for each silhouette.</label>
-            <label><input type="checkbox" data-check="platform" />Animate platform drift/speed ramp.</label>
-            <label><input type="checkbox" data-check="scoring" />Track time survived + perfect placement bonus.</label>
+          <h3 class="section-title">How scoring works</h3>
+          <div class="legend">
+            <span>• Every couch that lands adds +1 to tower height.</span>
+            <span>• Misaligned drops get trimmed—your next block is only as wide as the overlap.</span>
+            <span>• Land at least 10% of the previous width to keep going; otherwise, the tower topples.</span>
           </div>
         </div>
         <div class="panel">
-          <h3 class="section-title">Design notes</h3>
-          <ul class="muted" style="line-height: 1.6; padding-left: 1.1rem;">
-            <li>Score = time alive + items placed + streak bonus.</li>
-            <li>End state: topple detection or height threshold.</li>
-            <li>Touch-first controls with generous drop zones.</li>
-          </ul>
+          <h3 class="section-title">Controls</h3>
+          <div class="legend">
+            <span>Start: press <strong>Start run</strong>.</span>
+            <span>Drop: press <strong>Space</strong>, tap the canvas, or hit <strong>Drop couch</strong>.</span>
+            <span>Reset: clears the board and best run tracking.</span>
+          </div>
         </div>
         <div class="panel">
-          <h3 class="section-title">Session notes</h3>
-          <p class="muted">Fast jot for findings or tweaks. Saved locally.</p>
-          <textarea data-note rows="6" style="width: 100%; border-radius: 12px; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: var(--text);"></textarea>
+          <h3 class="section-title">Activity log</h3>
+          <ul class="log" data-log></ul>
         </div>
-      </section>
-
-      <section style="margin-top: 1.5rem;" class="panel">
-        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
-          <div>
-            <h3 class="section-title">Activity log</h3>
-            <p class="muted" style="margin: 0;">Button clicks appear here so you can wire deeper events later.</p>
-          </div>
-          <a class="btn secondary" href="../../README.md">Repo notes</a>
-        </div>
-        <ul class="log" data-log style="margin-top: 0.75rem;"></ul>
       </section>
     </main>
 
-    <script src="../common.js"></script>
     <script>
-      initGameSkeleton({ slug: 'couch-stack', title: 'Couch Stack', defaultStatus: 'Ready to stack.' });
+      const canvas = document.getElementById('stackCanvas');
+      const ctx = canvas.getContext('2d');
+      const statusEl = document.querySelector('[data-status]');
+      const messageEl = document.querySelector('[data-message]');
+      const heightEl = document.querySelector('[data-height]');
+      const bestEl = document.querySelector('[data-best]');
+      const lastEl = document.querySelector('[data-last]');
+      const logEl = document.querySelector('[data-log]');
+      const startBtn = document.querySelector('[data-action="start"]');
+      const dropBtn = document.querySelector('[data-action="drop"]');
+      const resetBtn = document.querySelector('[data-action="reset"]');
+
+      const colors = ['#67e8f9', '#93c5fd', '#a5b4fc', '#f9a826'];
+      const bestKey = 'fd-couch-stack-best';
+      let bestHeight = Number(localStorage.getItem(bestKey) || 0);
+      let animationId;
+      let running = false;
+      let block;
+      let stack = [];
+      let lastDrop = '—';
+
+      const writeLog = (text) => {
+        if (!logEl) return;
+        const item = document.createElement('li');
+        item.textContent = `[${new Date().toLocaleTimeString()}] ${text}`;
+        logEl.prepend(item);
+      };
+
+      const updateHud = () => {
+        const height = Math.max(stack.length - 1, 0);
+        heightEl.textContent = `${height} block${height === 1 ? '' : 's'}`;
+        bestEl.textContent = `${bestHeight} block${bestHeight === 1 ? '' : 's'}`;
+        lastEl.textContent = lastDrop;
+      };
+
+      const setStatus = (text, subtext) => {
+        statusEl.textContent = text;
+        if (subtext) messageEl.textContent = subtext;
+        writeLog(text);
+      };
+
+      const resetState = () => {
+        cancelAnimationFrame(animationId);
+        running = false;
+        stack = [];
+        block = null;
+        lastDrop = '—';
+        logEl.innerHTML = '';
+        setStatus('Waiting to start.', 'Tap the canvas or hit space to drop.');
+        drawBase();
+        updateHud();
+      };
+
+      const drawBase = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#0b1225';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'rgba(255,255,255,0.06)';
+        ctx.fillRect(0, canvas.height - 18, canvas.width, 18);
+      };
+
+      const drawBlock = (b) => {
+        ctx.fillStyle = b.color;
+        const left = b.x - b.width / 2;
+        ctx.fillRect(left, b.y, b.width, b.height);
+      };
+
+      const spawnBlock = () => {
+        const prev = stack[stack.length - 1];
+        const variance = Math.random() * 60 - 30;
+        const width = Math.max(70, Math.min(220, prev.width + variance));
+        block = {
+          width,
+          height: 24,
+          x: 80 + Math.random() * (canvas.width - 160),
+          y: 60,
+          direction: Math.random() > 0.5 ? 1 : -1,
+          speed: 1.6 + stack.length * 0.12,
+          falling: false,
+          fallSpeed: 5,
+          color: colors[stack.length % colors.length],
+        };
+        setStatus('New couch ready.', 'Time your drop for the cleanest overlap.');
+      };
+
+      const settleBlock = () => {
+        const prev = stack[stack.length - 1];
+        const left = block.x - block.width / 2;
+        const right = block.x + block.width / 2;
+        const prevLeft = prev.x - prev.width / 2;
+        const prevRight = prev.x + prev.width / 2;
+        const overlapLeft = Math.max(left, prevLeft);
+        const overlapRight = Math.min(right, prevRight);
+        const overlap = overlapRight - overlapLeft;
+
+        if (overlap <= prev.width * 0.1 || overlap <= 10) {
+          endRun('The tower tipped—too little overlap.');
+          return;
+        }
+
+        block.width = overlap;
+        block.x = overlapLeft + overlap / 2;
+        block.y = canvas.height - stack.reduce((sum, b) => sum + b.height, 0) - block.height;
+        stack.push({ ...block });
+        lastDrop = `${Math.round((overlap / prev.width) * 100)}% overlap kept.`;
+        bestHeight = Math.max(bestHeight, stack.length - 1);
+        localStorage.setItem(bestKey, String(bestHeight));
+        updateHud();
+        spawnBlock();
+      };
+
+      const endRun = (reason) => {
+        running = false;
+        cancelAnimationFrame(animationId);
+        setStatus('Run over.', reason);
+      };
+
+      const animate = () => {
+        if (!running) return;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawBase();
+        stack.forEach(drawBlock);
+
+        if (block) {
+          if (!block.falling) {
+            block.x += block.speed * block.direction;
+            const bounds = block.width / 2;
+            if (block.x <= bounds || block.x >= canvas.width - bounds) {
+              block.direction *= -1;
+            }
+          } else {
+            const targetY = canvas.height - stack.reduce((sum, b) => sum + b.height, 0) - block.height;
+            block.y += block.fallSpeed;
+            block.fallSpeed += 0.35;
+            if (block.y >= targetY) {
+              block.y = targetY;
+              block.falling = false;
+              settleBlock();
+            }
+          }
+
+          drawBlock(block);
+        }
+
+        animationId = requestAnimationFrame(animate);
+      };
+
+      const startRun = () => {
+        if (running) return;
+        stack = [
+          {
+            width: 220,
+            height: 26,
+            x: canvas.width / 2,
+            y: canvas.height - 26,
+            color: '#1e293b',
+          },
+        ];
+        running = true;
+        lastDrop = '—';
+        updateHud();
+        spawnBlock();
+        animate();
+      };
+
+      const drop = () => {
+        if (!running || !block || block.falling) return;
+        block.falling = true;
+        setStatus('Dropping.', 'Aim for the center to keep more width.');
+      };
+
+      startBtn.addEventListener('click', startRun);
+      dropBtn.addEventListener('click', drop);
+      resetBtn.addEventListener('click', () => {
+        localStorage.removeItem(bestKey);
+        bestHeight = 0;
+        resetState();
+      });
+      canvas.addEventListener('click', drop);
+      window.addEventListener('keydown', (event) => {
+        if (event.code === 'Space') {
+          event.preventDefault();
+          drop();
+        }
+      });
+
+      resetState();
     </script>
   </body>
 </html>

@@ -8,9 +8,9 @@ This folder packages design briefs and quick-start notes for each FD Games conce
 - Update the checklist to reflect progress across the catalog.
 
 ## Build checklist
-- [ ] Couch Stack
-- [ ] Room Rush
-- [ ] Find the Deal
+- [x] Couch Stack
+- [x] Room Rush
+- [x] Find the Deal
 - [ ] Memory Match: Furniture Edition
 - [ ] Swipe Sort: Bedroom vs Living Room
 - [ ] Price Is Right (Furniture Edition)
