@@ -408,6 +408,7 @@
       let lastHitTime = 0;
       let tierTimes = {};
       let obstacleStreak = 0;
+      let lastTickTime = 0;
 
       function renderMissions() {
         const saved = JSON.parse(localStorage.getItem('fd-rug-missions') || '{}');
@@ -492,7 +493,7 @@
           const item = document.createElement('div');
           item.className = type;
           item.classList.add(type === 'obstacle' ? 'obstacle' : 'pickup');
-          item.style.left = `${100 + idx * 14}%`;
+          item.style.left = `${100 + idx * 18}%`;
           item.style.bottom = `${height}px`;
           item.textContent = type === 'pickup' ? '+10' : moving ? 'Mover' : 'Crate';
           if (moving) {
@@ -598,6 +599,7 @@
         isRunning = true;
         statusEl.textContent = 'Sprint live!';
         startTime = performance.now();
+        lastTickTime = startTime;
         tierTimes = { 1: 0 };
         localStorage.setItem('fd-rug-tutorial', 'seen');
         loop();
@@ -606,11 +608,13 @@
       function loop() {
         if (!isRunning) return;
         const now = performance.now();
-        velocity += gravity;
+        const delta = Math.min((now - lastTickTime) / 16.67 || 1, 2);
+        lastTickTime = now;
+        velocity += gravity * delta;
         if (keysDown.has('Space') && runnerY > 0) {
-          velocity += 0.08;
+          velocity += 0.08 * delta;
         }
-        runnerY = Math.max(0, runnerY + velocity);
+        runnerY = Math.max(0, runnerY + velocity * delta);
         if (runnerY === 0) {
           velocity = 0;
           jumpsAvailable = 2;
@@ -620,12 +624,12 @@
         const elapsed = (now - startTime) / 1000;
         const previousTier = difficultyTier;
         difficultyTier = 1 + Math.floor(elapsed / 20);
-        tierTimes[difficultyTier] = (tierTimes[difficultyTier] || 0) + 1;
-        speed = 1 + (difficultyTier - 1) * 0.25 + (combo >= 3 ? 0.05 : 0) + (slideBoostTimer > 0 ? 0.15 : 0);
-        if (slideBoostTimer > 0) slideBoostTimer -= 1;
-        distance += 0.3 * speed;
-        let drain = (0.04 + difficultyTier * 0.006) * speed;
-        if (combo >= 3) drain -= 0.015 * Math.min(combo, 5);
+        tierTimes[difficultyTier] = (tierTimes[difficultyTier] || 0) + delta / 60;
+        speed = 0.9 + (difficultyTier - 1) * 0.18 + (combo >= 3 ? 0.04 : 0) + (slideBoostTimer > 0 ? 0.12 : 0);
+        if (slideBoostTimer > 0) slideBoostTimer -= delta;
+        distance += 0.24 * speed * delta;
+        let drain = (0.03 + difficultyTier * 0.005) * speed * delta;
+        if (combo >= 3) drain -= 0.012 * Math.min(combo, 5) * delta;
         if (hitCount === 0 && elapsed > 15) drain *= 0.92;
         energy = Math.max(0, Math.min(130, energy - drain));
         tipEl.textContent = `Pace ${difficultyTier} • Speed x${speed.toFixed(2)} • Combo ${combo}x${activeBuff ? ` • ${activeBuff}` : ''}`;
@@ -644,11 +648,11 @@
           }
         }
 
-        const spawnChance = graceTimer > 0 ? 0.02 : Math.min(0.05 + difficultyTier * 0.012, 0.15);
+        const spawnChance = graceTimer > 0 ? 0.012 : Math.min(0.04 + difficultyTier * 0.008, 0.1);
         if (graceTimer > 0) {
-          graceTimer -= 1;
+          graceTimer -= delta;
         }
-        if (Math.random() < spawnChance) {
+        if (Math.random() < spawnChance * delta) {
           let pattern = patterns[Math.floor(Math.random() * patterns.length)];
           if (obstacleStreak >= 2) {
             pattern = patterns.find((p) => p.some((slot) => slot.type === 'pickup')) || pattern;
@@ -662,17 +666,17 @@
         const runnerBox = runnerEl.getBoundingClientRect();
 
         objects.forEach((obj) => {
-          const left = (parseFloat(obj.el.style.left) || 100) - (1.6 + speed * 0.6);
+          const left = (parseFloat(obj.el.style.left) || 100) - (1.1 + speed * 0.45) * delta;
           obj.el.style.left = `${left}%`;
           if (obj.el.dataset.moving === '1') {
-            const wobble = Math.sin(now / 200 + left) * 12;
-            obj.el.style.bottom = `${32 + wobble}px`;
+            const wobble = Math.sin(now / 240 + left) * 8;
+            obj.el.style.bottom = `${Math.max(18, 32 + wobble)}px`;
           }
           if (activeBuff === 'magnet' && obj.type === 'pickup') {
             const targetBottom = 22 + runnerY + 12;
             const currentBottom = parseFloat(obj.el.style.bottom) || 22;
             obj.el.style.bottom = `${currentBottom + (targetBottom - currentBottom) * 0.08}px`;
-            obj.el.style.left = `${left - 0.4}%`;
+            obj.el.style.left = `${left - 0.35 * delta}%`;
           }
         });
         objects = objects.filter((obj) => {
@@ -738,7 +742,7 @@
           summaryDistance.textContent = `${distance.toFixed(1)}m`;
           summaryPickups.textContent = `${pickups} pickups (best combo ${bestCombo}x)`;
           const tiers = Object.entries(tierTimes)
-            .map(([tier, frames]) => `P${tier}: ${(frames / 60).toFixed(1)}s`)
+            .map(([tier, frames]) => `P${tier}: ${frames.toFixed(1)}s`)
             .join(' · ');
           summaryBest.textContent = `${best.toFixed(1)}m`;
           summaryText.textContent = `Hits ${hitCount}, near misses ${nearMisses}. ${tiers}. Buffs ${activeBuff ? 'active' : 'spent'}.`;
