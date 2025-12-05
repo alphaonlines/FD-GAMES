@@ -11,14 +11,18 @@
     <style>
       .track {
         position: relative;
-        height: 220px;
+        height: 240px;
         border-radius: 14px;
         border: 1px solid rgba(255, 255, 255, 0.08);
         background: linear-gradient(180deg, rgba(102, 224, 255, 0.08), rgba(255, 255, 255, 0.02));
         overflow: hidden;
+        isolation: isolate;
       }
 
-      .runner, .obstacle, .pickup {
+      .runner,
+      .obstacle,
+      .pickup,
+      .tip {
         position: absolute;
         bottom: 22px;
         width: 46px;
@@ -34,6 +38,41 @@
         background: linear-gradient(120deg, #66e0ff, #3b82f6);
         color: #031126;
         box-shadow: 0 10px 24px rgba(59, 130, 246, 0.35);
+        transition: transform 0.12s ease, height 0.12s ease, bottom 0.12s ease;
+      }
+
+      .runner.jump {
+        transform: translateY(4px) scale(1.04);
+      }
+
+      .runner.slide {
+        height: 28px;
+        bottom: 12px;
+        border-radius: 14px;
+      }
+
+      .runner.hit {
+        animation: shake 0.35s;
+      }
+
+      @keyframes shake {
+        10%,
+        90% {
+          transform: translateX(-2px);
+        }
+        20%,
+        80% {
+          transform: translateX(4px);
+        }
+        30%,
+        50%,
+        70% {
+          transform: translateX(-6px);
+        }
+        40%,
+        60% {
+          transform: translateX(6px);
+        }
       }
 
       .obstacle {
@@ -46,11 +85,86 @@
         color: #0a1a0f;
       }
 
+      .tip {
+        background: rgba(255, 255, 255, 0.12);
+        color: #e8f1ff;
+        font-size: 12px;
+        width: auto;
+        min-width: 160px;
+        padding: 0.35rem 0.65rem;
+        height: auto;
+        bottom: auto;
+        top: 16px;
+        right: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+      }
+
       .controls {
         display: flex;
         gap: 0.6rem;
         flex-wrap: wrap;
         margin-top: 0.75rem;
+        align-items: center;
+      }
+
+      .hud-progress {
+        width: 100%;
+        height: 8px;
+        background: rgba(255, 255, 255, 0.08);
+        border-radius: 6px;
+        overflow: hidden;
+      }
+
+      .hud-progress span {
+        display: block;
+        height: 100%;
+        background: linear-gradient(90deg, #22c55e, #3b82f6);
+        width: 100%;
+      }
+
+      .pill.small {
+        padding: 0.2rem 0.5rem;
+        font-size: 12px;
+      }
+
+      .hotkey-hint {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 12px;
+      }
+
+      .overlay,
+      .summary {
+        position: fixed;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(2, 6, 23, 0.75);
+        backdrop-filter: blur(4px);
+        z-index: 20;
+        padding: 1rem;
+      }
+
+      .overlay.active,
+      .summary.active {
+        display: flex;
+      }
+
+      .card.solid {
+        background: linear-gradient(160deg, rgba(14, 165, 233, 0.12), rgba(15, 118, 110, 0.12));
+        border: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .track-buttons {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 0.4rem;
+      }
+
+      .combo-badge {
+        background: rgba(34, 197, 94, 0.12);
+        color: #4ade80;
+        border: 1px solid rgba(74, 222, 128, 0.24);
       }
     </style>
   </head>
@@ -88,10 +202,56 @@
         </div>
         <div class="panel">
           <h3 class="section-title">Track</h3>
-          <div class="track" id="track"></div>
+          <div class="track" id="track">
+            <div class="tip" data-tip>Stay low to slide under crates. Arrow/W = jump, ArrowDown/S = slide.</div>
+          </div>
+          <div class="controls" style="margin-top: 0.75rem;">
+            <div class="track-buttons">
+              <button class="btn" data-action="jump">Jump (Space/W/↑)</button>
+              <button class="btn secondary" data-action="slide">Slide (S/↓)</button>
+            </div>
+            <span class="hotkey-hint">Tip: double-jump once mid-air for an extra lift.</span>
+          </div>
         </div>
       </section>
     </main>
+
+    <div class="overlay" data-tutorial>
+      <div class="card solid" style="max-width: 520px;">
+        <div class="card-body">
+          <p class="badge">Quick tutorial</p>
+          <h3>Jump, slide, and chain décor pickups</h3>
+          <ul style="margin: 0.5rem 0 1rem 1rem;">
+            <li>Space/W/↑ to jump. Tap twice for a double-jump.</li>
+            <li>S/↓ to slide under low crates. Short cooldown keeps timing tight.</li>
+            <li>Pickups refill energy; chaining them builds a combo meter for bonus distance.</li>
+          </ul>
+          <div class="controls">
+            <button class="btn" data-action="begin">Start run</button>
+            <button class="btn outline" data-action="skip-tutorial">Skip next time</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary" data-summary>
+      <div class="card solid" style="max-width: 520px;">
+        <div class="card-body">
+          <p class="badge">Run complete</p>
+          <h3>Nice sprint!</h3>
+          <p data-summary-text></p>
+          <div class="hud" style="margin-top: 0.5rem;">
+            <div class="stat"><span>Distance</span><strong data-summary-distance>0m</strong></div>
+            <div class="stat"><span>Pickups</span><strong data-summary-pickups>0</strong></div>
+            <div class="stat"><span>Best</span><strong data-summary-best>0m</strong></div>
+          </div>
+          <div class="controls" style="margin-top: 0.75rem;">
+            <button class="btn" data-action="restart">Restart</button>
+            <button class="btn secondary" data-action="share">Share score</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <script>
       const track = document.getElementById('track');
@@ -99,17 +259,47 @@
       const distanceEl = document.querySelector('[data-distance]');
       const energyEl = document.querySelector('[data-energy]');
       const bestEl = document.querySelector('[data-best]');
+      const tutorialOverlay = document.querySelector('[data-tutorial]');
+      const summaryOverlay = document.querySelector('[data-summary]');
+      const summaryText = document.querySelector('[data-summary-text]');
+      const summaryDistance = document.querySelector('[data-summary-distance]');
+      const summaryPickups = document.querySelector('[data-summary-pickups]');
+      const summaryBest = document.querySelector('[data-summary-best]');
+      const tipEl = document.querySelector('[data-tip]');
+      const energyBar = document.createElement('div');
+      energyBar.className = 'hud-progress';
+      energyBar.innerHTML = '<span style="width: 100%"></span>';
+      energyEl.parentElement?.appendChild(energyBar);
 
       let runnerEl = null;
       let runnerY = 0;
       let velocity = 0;
-      let gravity = -0.5;
+      let gravity = -0.55;
       let isRunning = false;
       let distance = 0;
       let energy = 100;
       let best = Number(localStorage.getItem('fd-rug-best') || 0);
       let objects = [];
       let tickId = null;
+      let difficultyTier = 1;
+      let startTime = 0;
+      let speed = 1;
+      let jumpsAvailable = 2;
+      let sliding = false;
+      let slideCooldown = false;
+      let pickups = 0;
+      let combo = 0;
+      let bestCombo = 0;
+
+      const patterns = [
+        ['obstacle'],
+        ['pickup'],
+        ['pickup', 'obstacle'],
+        ['obstacle', 'pickup'],
+        ['pickup', 'pickup'],
+        ['obstacle', 'obstacle'],
+        ['pickup', 'obstacle', 'pickup'],
+      ];
 
       function renderRunner() {
         if (!runnerEl) {
@@ -121,29 +311,53 @@
         runnerEl.style.bottom = `${22 + runnerY}px`;
       }
 
-      function spawn() {
-        const type = Math.random() < 0.7 ? 'obstacle' : 'pickup';
-        const item = document.createElement('div');
-        item.className = type;
-        item.classList.add(type === 'obstacle' ? 'obstacle' : 'pickup');
-        item.style.left = '100%';
-        item.style.bottom = type === 'pickup' ? '82px' : '22px';
-        item.textContent = type === 'pickup' ? '+10' : 'Crate';
-        track.appendChild(item);
-        objects.push({ el: item, type });
+      function spawnPattern(pattern = ['obstacle']) {
+        pattern.forEach((type, idx) => {
+          const item = document.createElement('div');
+          item.className = type;
+          item.classList.add(type === 'obstacle' ? 'obstacle' : 'pickup');
+          item.style.left = `${100 + idx * 14}%`;
+          item.style.bottom = type === 'pickup' ? '88px' : '22px';
+          item.textContent = type === 'pickup' ? '+10' : 'Crate';
+          track.appendChild(item);
+          objects.push({ el: item, type });
+        });
       }
 
       function updateHUD() {
         distanceEl.textContent = `${distance.toFixed(1)}m`;
         energyEl.textContent = `${energy.toFixed(0)}%`;
+        const clamped = Math.max(0, Math.min(100, energy));
+        energyBar.querySelector('span').style.width = `${clamped}%`;
         bestEl.textContent = `${best.toFixed(1)}m`;
       }
 
       function jump() {
         if (!isRunning) return;
-        if (runnerY > 0) return;
-        velocity = 9;
-        statusEl.textContent = 'Jump!';
+        if (jumpsAvailable <= 0) return;
+        velocity = jumpsAvailable === 2 ? 9.5 : 8;
+        runnerEl?.classList.add('jump');
+        setTimeout(() => runnerEl?.classList.remove('jump'), 200);
+        statusEl.textContent = jumpsAvailable === 2 ? 'Jump!' : 'Double jump!';
+        if (jumpsAvailable === 1) {
+          energy = Math.max(0, energy - 2);
+        }
+        jumpsAvailable -= 1;
+      }
+
+      function slide() {
+        if (!isRunning || sliding || slideCooldown) return;
+        sliding = true;
+        slideCooldown = true;
+        runnerEl?.classList.add('slide');
+        statusEl.textContent = 'Slide!';
+        setTimeout(() => {
+          sliding = false;
+          runnerEl?.classList.remove('slide');
+        }, 600);
+        setTimeout(() => {
+          slideCooldown = false;
+        }, 900);
       }
 
       function reset() {
@@ -154,17 +368,29 @@
         distance = 0;
         energy = 100;
         isRunning = false;
+        difficultyTier = 1;
+        speed = 1;
+        jumpsAvailable = 2;
+        sliding = false;
+        slideCooldown = false;
+        pickups = 0;
+        combo = 0;
+        bestCombo = Number(localStorage.getItem('fd-rug-combo') || 0);
         statusEl.textContent = 'Reset. Start sprint to run again.';
         updateHUD();
         renderRunner();
         if (tickId) cancelAnimationFrame(tickId);
         tickId = null;
+        summaryOverlay.classList.remove('active');
+        runnerEl?.classList.remove('slide', 'hit');
       }
 
       function start() {
         reset();
         isRunning = true;
         statusEl.textContent = 'Sprint live!';
+        startTime = performance.now();
+        localStorage.setItem('fd-rug-tutorial', 'seen');
         loop();
       }
 
@@ -172,16 +398,28 @@
         if (!isRunning) return;
         velocity += gravity;
         runnerY = Math.max(0, runnerY + velocity);
-        if (runnerY === 0) velocity = 0;
+        if (runnerY === 0) {
+          velocity = 0;
+          jumpsAvailable = 2;
+        }
         renderRunner();
-        distance += 0.3;
-        energy = Math.max(0, energy - 0.05);
-        if (Math.random() < 0.04) spawn();
+        const elapsed = (performance.now() - startTime) / 1000;
+        difficultyTier = 1 + Math.floor(elapsed / 20);
+        speed = 1 + (difficultyTier - 1) * 0.25;
+        distance += 0.3 * speed;
+        energy = Math.max(0, energy - 0.05 * speed);
+        tipEl.textContent = `Pace ${difficultyTier} • Speed x${speed.toFixed(2)} • Combo ${combo}x`;
+
+        const spawnChance = Math.min(0.04 + difficultyTier * 0.01, 0.12);
+        if (Math.random() < spawnChance) {
+          const pattern = patterns[Math.floor(Math.random() * patterns.length)];
+          spawnPattern(pattern);
+        }
 
         const runnerBox = runnerEl.getBoundingClientRect();
 
         objects.forEach((obj) => {
-          const left = (parseFloat(obj.el.style.left) || 100) - 1.8;
+          const left = (parseFloat(obj.el.style.left) || 100) - (1.6 + speed * 0.6);
           obj.el.style.left = `${left}%`;
         });
         objects = objects.filter((obj) => {
@@ -191,15 +429,26 @@
             return false;
           }
           const objBox = obj.el.getBoundingClientRect();
-          const collides = runnerBox.left < objBox.right && runnerBox.right > objBox.left && runnerBox.top < objBox.bottom && runnerBox.bottom > objBox.top;
+          const collides =
+            runnerBox.left < objBox.right &&
+            runnerBox.right > objBox.left &&
+            runnerBox.top < objBox.bottom &&
+            runnerBox.bottom > objBox.top;
           if (collides) {
             if (obj.type === 'pickup') {
-              distance += 3;
-              energy = Math.min(100, energy + 8);
-              statusEl.textContent = 'Decor snagged!';
+              distance += 3 + combo * 0.5;
+              energy = Math.min(100, energy + 10);
+              pickups += 1;
+              combo += 1;
+              bestCombo = Math.max(bestCombo, combo);
+              localStorage.setItem('fd-rug-combo', String(bestCombo));
+              statusEl.textContent = combo > 1 ? `Decor chain x${combo}!` : 'Decor snagged!';
             } else {
-              energy -= 15;
-              statusEl.textContent = 'Ouch! Crate collision.';
+              energy -= sliding ? 5 : 18;
+              statusEl.textContent = sliding ? 'Glancing blow while sliding.' : 'Ouch! Crate collision.';
+              runnerEl?.classList.add('hit');
+              setTimeout(() => runnerEl?.classList.remove('hit'), 350);
+              combo = 0;
             }
             obj.el.remove();
             return false;
@@ -212,6 +461,11 @@
           best = Math.max(best, distance);
           localStorage.setItem('fd-rug-best', best);
           statusEl.textContent = 'Energy out. Reset to sprint again.';
+          summaryDistance.textContent = `${distance.toFixed(1)}m`;
+          summaryPickups.textContent = `${pickups} pickups (best combo ${bestCombo}x)`;
+          summaryBest.textContent = `${best.toFixed(1)}m`;
+          summaryText.textContent = `Pace ${difficultyTier}, speed x${speed.toFixed(2)}. Combos grant bonus meters—chain pickups to climb the leaderboard.`;
+          summaryOverlay.classList.add('active');
         }
 
         updateHUD();
@@ -220,13 +474,45 @@
 
       document.querySelector('[data-action="start"]').addEventListener('click', start);
       document.querySelector('[data-action="jump"]').addEventListener('click', jump);
+      document.querySelector('[data-action="slide"]').addEventListener('click', slide);
       document.querySelector('[data-action="reset"]').addEventListener('click', reset);
+      document.querySelector('[data-action="restart"]').addEventListener('click', () => {
+        summaryOverlay.classList.remove('active');
+        start();
+      });
+      document.querySelector('[data-action="share"]').addEventListener('click', async () => {
+        const shareText = `I sprinted ${distance.toFixed(1)}m in Rug Runner with a ${bestCombo}x decor combo!`;
+        if (navigator.share) {
+          await navigator.share({ text: shareText, title: 'Rug Runner score' });
+        } else if (navigator.clipboard) {
+          await navigator.clipboard.writeText(shareText);
+          statusEl.textContent = 'Copied score to clipboard!';
+        }
+      });
+      document.querySelector('[data-action="begin"]').addEventListener('click', () => {
+        tutorialOverlay.classList.remove('active');
+        start();
+      });
+      document.querySelector('[data-action="skip-tutorial"]').addEventListener('click', () => {
+        localStorage.setItem('fd-rug-tutorial', 'seen');
+        tutorialOverlay.classList.remove('active');
+        statusEl.textContent = 'Tutorial skipped. Start sprint to play!';
+      });
       document.addEventListener('keydown', (e) => {
         if (e.code === 'Space') {
           e.preventDefault();
           jump();
+        } else if (e.code === 'ArrowUp' || e.code === 'KeyW') {
+          jump();
+        } else if (e.code === 'ArrowDown' || e.code === 'KeyS') {
+          slide();
         }
       });
+
+      bestCombo = Number(localStorage.getItem('fd-rug-combo') || 0);
+      if (!localStorage.getItem('fd-rug-tutorial')) {
+        tutorialOverlay.classList.add('active');
+      }
 
       renderRunner();
       updateHUD();
