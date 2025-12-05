@@ -3,22 +3,75 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Delivery Dash | FD Games</title>
+    <title>Delivery Dash Prototype | FD Games</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="../common.css" />
+    <style>
+      .lanes {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.6rem;
+        margin-top: 1rem;
+      }
+
+      .lane {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        padding: 0.75rem;
+        min-height: 320px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .tile {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 72%;
+        height: 32px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        color: #031126;
+        font-weight: 700;
+      }
+
+      .tile.player {
+        background: linear-gradient(120deg, #66e0ff, #3b82f6);
+        box-shadow: 0 10px 24px rgba(59, 130, 246, 0.35);
+      }
+
+      .tile.obstacle {
+        background: rgba(252, 165, 165, 0.9);
+        color: #320000;
+      }
+
+      .tile.pickup {
+        background: rgba(34, 197, 94, 0.9);
+        color: #0a1a0f;
+      }
+
+      .controls {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-top: 0.75rem;
+      }
+    </style>
   </head>
   <body>
     <header>
       <div class="navbar">
         <div class="nav-left">
           <span class="brand">FD Games</span>
-          <span class="pill">Delivery Dash</span>
+          <span class="pill">Prototype</span>
         </div>
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
           <a class="btn secondary" href="../../index.html">Back to hub</a>
-          <button class="btn outline" data-action="reset">Reset state</button>
+          <button class="btn outline" data-action="reset">Reset run</button>
         </div>
       </div>
     </header>
@@ -26,67 +79,156 @@
     <main class="container">
       <section class="hero">
         <div>
-          <p class="badge">Lane runner</p>
-          <h1>Swipe lanes to dodge traffic and collect reviews.</h1>
-          <p>
-            Drop in a simple 3-lane runner with swipe inputs, pickups, and obstacles. Use this skeleton to plug in your loop
-            and speed ramp.
-          </p>
-          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem;">
-            <button class="btn" data-action="start">Start dash</button>
+          <p class="badge">3-lane dodger</p>
+          <h1>Delivery Dash prototype</h1>
+          <p>Swap lanes to dodge traffic cones and collect 5-star reviews. Run lasts until you lose all hearts.</p>
+          <div class="hud" style="margin-top: 0.75rem;">
+            <div class="stat"><span>Score</span><strong data-score>0</strong></div>
+            <div class="stat"><span>Hearts</span><strong data-hearts>3</strong></div>
+            <div class="stat"><span>Best score</span><strong data-best>0</strong></div>
+          </div>
+          <div class="controls">
+            <button class="btn" data-action="start">Start run</button>
+            <button class="btn secondary" data-action="left">← Left</button>
+            <button class="btn secondary" data-action="right">Right →</button>
             <a class="btn secondary" href="../../start/delivery-dash/README.md">View brief</a>
           </div>
-          <div class="status" style="margin-top: 1rem;">
-            <span class="status-indicator"></span>
-            <span data-status>Waiting for lanes.</span>
-          </div>
+          <p class="muted" style="margin-top: 0.5rem;" data-status>Press start to spawn traffic.</p>
         </div>
         <div class="panel">
           <h3 class="section-title">Lanes</h3>
-          <p class="muted">Use this block for lane rendering and swipe listeners.</p>
-          <div class="placeholder-area">Lane runner placeholder.</div>
+          <div class="lanes" id="lanes"></div>
         </div>
-      </section>
-
-      <section style="margin-top: 1.5rem;" class="subgrid">
-        <div class="panel">
-          <h3 class="section-title">Build checklist</h3>
-          <div class="checklist" style="display: grid; gap: 0.75rem;">
-            <label><input type="checkbox" data-check="lanes" />3-lane movement + swipe controls.</label>
-            <label><input type="checkbox" data-check="obstacles" />Obstacles + collision detection.</label>
-            <label><input type="checkbox" data-check="pickups" />Pickups for 5-star reviews and boosts.</label>
-          </div>
-        </div>
-        <div class="panel">
-          <h3 class="section-title">Design notes</h3>
-          <ul class="muted" style="line-height: 1.6; padding-left: 1.1rem;">
-            <li>Speed ramps per milestone distance.</li>
-            <li>Animate truck wrap with FD branding.</li>
-            <li>Track distance + pickups for score.</li>
-          </ul>
-        </div>
-        <div class="panel">
-          <h3 class="section-title">Session notes</h3>
-          <p class="muted">Fast jot for findings or tweaks. Saved locally.</p>
-          <textarea data-note rows="6" style="width: 100%; border-radius: 12px; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: var(--text);"></textarea>
-        </div>
-      </section>
-
-      <section style="margin-top: 1.5rem;" class="panel">
-        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
-          <div>
-            <h3 class="section-title">Activity log</h3>
-            <p class="muted" style="margin: 0;">Capture starts/resets and wire deeper metrics later.</p>
-          </div>
-          <a class="btn secondary" href="../../README.md">Repo notes</a>
-        </div>
-        <ul class="log" data-log style="margin-top: 0.75rem;"></ul>
       </section>
     </main>
 
-    <script src="../common.js"></script>
     <script>
-      initGameSkeleton({ slug: 'delivery-dash', title: 'Delivery Dash', defaultStatus: 'Lane logic coming up.' });
+      const lanesContainer = document.getElementById('lanes');
+      const statusEl = document.querySelector('[data-status]');
+      const scoreEl = document.querySelector('[data-score]');
+      const heartsEl = document.querySelector('[data-hearts]');
+      const bestEl = document.querySelector('[data-best]');
+
+      let playerLane = 1;
+      let score = 0;
+      let hearts = 3;
+      let best = Number(localStorage.getItem('fd-dash-best') || 0);
+      let tickId = null;
+      let objects = [];
+      let rowHeight = 32 + 8;
+
+      function buildLanes() {
+        lanesContainer.innerHTML = '';
+        for (let i = 0; i < 3; i += 1) {
+          const lane = document.createElement('div');
+          lane.className = 'lane';
+          lane.dataset.index = i;
+          lane.addEventListener('click', () => moveTo(i));
+          lanesContainer.appendChild(lane);
+        }
+      }
+
+      function moveTo(lane) {
+        playerLane = Math.max(0, Math.min(2, lane));
+        statusEl.textContent = `Lane ${playerLane + 1} selected.`;
+        render();
+      }
+
+      function spawn() {
+        const type = Math.random() < 0.75 ? 'obstacle' : 'pickup';
+        const lane = Math.floor(Math.random() * 3);
+        objects.push({ lane, y: -rowHeight, type });
+      }
+
+      function update() {
+        objects.forEach((obj) => {
+          obj.y += rowHeight * 0.85;
+        });
+        objects = objects.filter((obj) => obj.y < 360);
+
+        const collision = objects.find((o) => o.lane === playerLane && o.y > 240 && o.y < 280);
+        if (collision) {
+          if (collision.type === 'obstacle') {
+            hearts -= 1;
+            statusEl.textContent = 'Hit a cone! Heart lost.';
+            objects = objects.filter((o) => o !== collision);
+          } else {
+            score += 25;
+            statusEl.textContent = 'Pickup collected!';
+            objects = objects.filter((o) => o !== collision);
+          }
+          updateHUD();
+        }
+
+        if (Math.random() < 0.45) spawn();
+        render();
+
+        if (hearts <= 0) {
+          stop();
+          best = Math.max(best, score);
+          localStorage.setItem('fd-dash-best', best);
+          statusEl.textContent = 'Run over. Press start to try again.';
+          updateHUD();
+          return;
+        }
+
+        tickId = requestAnimationFrame(update);
+      }
+
+      function render() {
+        lanesContainer.querySelectorAll('.lane').forEach((laneEl) => {
+          laneEl.innerHTML = '';
+        });
+
+        const player = document.createElement('div');
+        player.className = 'tile player';
+        player.style.bottom = '12px';
+        player.textContent = 'Van';
+        lanesContainer.querySelector(`[data-index="${playerLane}"]`).appendChild(player);
+
+        objects.forEach((obj) => {
+          const div = document.createElement('div');
+          div.className = `tile ${obj.type}`;
+          div.style.top = `${obj.y}px`;
+          div.textContent = obj.type === 'obstacle' ? 'Cone' : '+★';
+          lanesContainer.querySelector(`[data-index="${obj.lane}"]`).appendChild(div);
+        });
+      }
+
+      function updateHUD() {
+        scoreEl.textContent = score;
+        heartsEl.textContent = hearts;
+        bestEl.textContent = best;
+      }
+
+      function start() {
+        objects = [];
+        score = 0;
+        hearts = 3;
+        moveTo(1);
+        updateHUD();
+        statusEl.textContent = 'Deliveries rolling. Avoid cones, grab stars!';
+        if (tickId) cancelAnimationFrame(tickId);
+        tickId = requestAnimationFrame(update);
+      }
+
+      function stop() {
+        if (tickId) cancelAnimationFrame(tickId);
+        tickId = null;
+      }
+
+      document.querySelector('[data-action="start"]').addEventListener('click', start);
+      document.querySelector('[data-action="left"]').addEventListener('click', () => moveTo(playerLane - 1));
+      document.querySelector('[data-action="right"]').addEventListener('click', () => moveTo(playerLane + 1));
+      document.querySelector('[data-action="reset"]').addEventListener('click', start);
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') moveTo(playerLane - 1);
+        if (e.key === 'ArrowRight') moveTo(playerLane + 1);
+      });
+
+      buildLanes();
+      updateHUD();
+      render();
     </script>
   </body>
 </html>

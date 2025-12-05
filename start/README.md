@@ -8,16 +8,16 @@ This folder packages design briefs and quick-start notes for each FD Games conce
 - Update the checklist to reflect progress across the catalog.
 
 ## Build checklist
-- [ ] Couch Stack
-- [ ] Room Rush
-- [ ] Find the Deal
-- [ ] Memory Match: Furniture Edition
-- [ ] Swipe Sort: Bedroom vs Living Room
-- [ ] Price Is Right (Furniture Edition)
-- [ ] Delivery Dash
-- [ ] Rug Runner
-- [ ] Build-a-Room: Before/After
-- [ ] Sofa Tetris
+- [x] Couch Stack
+- [x] Room Rush
+- [x] Find the Deal
+- [x] Memory Match: Furniture Edition
+- [x] Swipe Sort: Bedroom vs Living Room
+- [x] Price Is Right (Furniture Edition)
+- [x] Delivery Dash
+- [x] Rug Runner
+- [x] Build-a-Room: Before/After
+- [x] Sofa Tetris
 
 ## Game briefs
 Each subfolder contains a README with:

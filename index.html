@@ -3,38 +3,21 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FD Games | Training Hub</title>
-    <meta
-      name="description"
-      content="Landing page for FD Games with quick access to training games and policy references."
-    />
-    <link
-      rel="preconnect"
-      href="https://fonts.googleapis.com"
-    />
-    <link
-      rel="preconnect"
-      href="https://fonts.gstatic.com"
-      crossorigin
-    />
+    <title>FD Games | Landing</title>
+    <meta name="description" content="FD Games landing page with quick links to every kiosk game and design brief." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
-      crossorigin="anonymous"
-    />
     <style>
       :root {
-        --bg: #0b1021;
-        --card: #11162b;
-        --accent: #6ee7ff;
-        --accent-2: #f9a826;
-        --muted: #c6ccda;
-        --text: #f5f7fb;
+        --bg: #050914;
+        --panel: #0f1730;
+        --muted: #cfd6e5;
+        --text: #f4f7fb;
+        --accent: #66e0ff;
       }
 
       * {
@@ -43,186 +26,150 @@
 
       body {
         margin: 0;
-        font-family: 'Inter', system-ui, -apple-system, sans-serif;
-        background: radial-gradient(circle at 15% 20%, rgba(110, 231, 255, 0.12), transparent 25%),
-          radial-gradient(circle at 80% 0%, rgba(249, 168, 38, 0.14), transparent 23%),
-          linear-gradient(145deg, #050915, #0c1228 55%, #0b1021);
+        background: radial-gradient(circle at 12% 18%, rgba(102, 224, 255, 0.08), transparent 25%),
+          radial-gradient(circle at 78% 8%, rgba(249, 168, 38, 0.06), transparent 22%),
+          linear-gradient(140deg, #050914 0%, #0b1327 50%, #050914 100%);
         color: var(--text);
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
         min-height: 100vh;
       }
 
-      a {
-        color: inherit;
-        text-decoration: none;
-      }
-
       header {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(5, 9, 20, 0.75);
+        backdrop-filter: blur(12px);
         position: sticky;
         top: 0;
         z-index: 10;
-        backdrop-filter: blur(14px);
-        background: rgba(12, 18, 40, 0.8);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
       }
 
-      .navbar-brand {
-        font-weight: 700;
-        letter-spacing: 0.02em;
-      }
-
-      .badge-soft {
-        background: rgba(110, 231, 255, 0.12);
-        color: var(--text);
-        border: 1px solid rgba(110, 231, 255, 0.35);
-        padding: 0.45rem 0.75rem;
-        border-radius: 999px;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.35rem;
-      }
-
-      .hero {
-        padding: 4rem 1.5rem 1.5rem;
-      }
-
-      .hero h1 {
-        font-size: clamp(2rem, 3vw + 1rem, 3rem);
-        letter-spacing: -0.02em;
-        margin-bottom: 1rem;
-      }
-
-      .hero p {
-        max-width: 720px;
-        color: var(--muted);
-        font-size: 1.05rem;
-        line-height: 1.6;
-      }
-
-      .pill {
-        background: rgba(255, 255, 255, 0.06);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        padding: 0.9rem 1.1rem;
-        border-radius: 14px;
+      .nav {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 1rem 1.25rem;
         display: flex;
         align-items: center;
-        gap: 0.8rem;
-        color: var(--muted);
-      }
-
-      .gradient-card {
-        background: linear-gradient(135deg, rgba(110, 231, 255, 0.12), rgba(12, 18, 40, 0.95));
-        border: 1px solid rgba(110, 231, 255, 0.3);
-        border-radius: 18px;
-        padding: 1.25rem 1.5rem;
-      }
-
-      .btn-cta {
-        background: linear-gradient(120deg, #6ee7ff, #3b82f6);
-        color: #031126;
-        font-weight: 700;
-        border: none;
-        padding: 0.85rem 1.35rem;
-        border-radius: 12px;
-        box-shadow: 0 10px 30px rgba(59, 130, 246, 0.35);
-      }
-
-      .btn-ghost {
-        background: rgba(255, 255, 255, 0.06);
-        color: var(--text);
-        border: 1px solid rgba(255, 255, 255, 0.14);
-        padding: 0.85rem 1.35rem;
-        border-radius: 12px;
-      }
-
-      .section-title {
-        font-weight: 700;
-        letter-spacing: -0.01em;
-        margin-bottom: 0.5rem;
-      }
-
-      .muted {
-        color: var(--muted);
-      }
-
-      .card-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        justify-content: space-between;
         gap: 1rem;
       }
 
-      .tile {
-        background: var(--card);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 16px;
-        padding: 1.25rem;
-        box-shadow: 0 14px 40px rgba(0, 0, 0, 0.22);
+      .brand {
+        font-weight: 800;
+        letter-spacing: 0.02em;
       }
 
-      .tile h3 {
-        margin-bottom: 0.25rem;
-        letter-spacing: -0.01em;
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 1.5rem 1.25rem 2.5rem;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.25rem;
+        align-items: center;
+        margin-top: 1.5rem;
+      }
+
+      .hero h1 {
+        margin: 0 0 0.5rem;
+        letter-spacing: -0.02em;
+      }
+
+      .hero p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 1.35rem;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
       }
 
       .tag {
         display: inline-flex;
         align-items: center;
         gap: 0.35rem;
-        padding: 0.35rem 0.6rem;
+        padding: 0.4rem 0.65rem;
         border-radius: 999px;
         background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: var(--muted);
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+
+      .actions {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        margin-top: 1rem;
+      }
+
+      .btn {
+        border: none;
+        border-radius: 10px;
+        padding: 0.65rem 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        color: #031126;
+        background: linear-gradient(120deg, #66e0ff, #3b82f6);
+        box-shadow: 0 12px 32px rgba(59, 130, 246, 0.35);
+        text-decoration: none;
+      }
+
+      .btn.secondary {
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--text);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        box-shadow: none;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+
+      .card {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        padding: 1rem;
+        display: grid;
+        gap: 0.35rem;
+      }
+
+      .card h3 {
+        margin: 0;
+        letter-spacing: -0.01em;
+      }
+
+      .muted {
+        color: var(--muted);
+        margin: 0;
+        line-height: 1.6;
+      }
+
+      .pill {
+        display: inline-flex;
+        padding: 0.35rem 0.6rem;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
         color: var(--muted);
         font-weight: 600;
         font-size: 0.9rem;
       }
 
-      .timeline {
-        position: relative;
-        padding-left: 1.5rem;
-        border-left: 2px dashed rgba(255, 255, 255, 0.18);
-      }
-
-      .timeline .step {
-        position: relative;
-        padding-left: 0.75rem;
-        margin-bottom: 1rem;
-      }
-
-      .timeline .dot {
-        position: absolute;
-        left: -1.1rem;
-        top: 0.25rem;
-        width: 14px;
-        height: 14px;
-        border-radius: 50%;
-        background: var(--accent);
-        box-shadow: 0 0 0 6px rgba(110, 231, 255, 0.18);
-      }
-
-      .checklist .item {
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 12px;
-        padding: 0.9rem 1rem;
-        display: flex;
-        gap: 0.75rem;
-        align-items: flex-start;
-      }
-
-      .item input[type='checkbox'] {
-        margin-top: 0.25rem;
-        accent-color: #3b82f6;
-      }
-
-      .banner {
-        background: linear-gradient(120deg, rgba(59, 130, 246, 0.24), rgba(249, 168, 38, 0.22));
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: 18px;
-        padding: 1.5rem;
-      }
-
       footer {
         padding: 1.5rem;
+        text-align: center;
         color: var(--muted);
         font-size: 0.95rem;
         border-top: 1px solid rgba(255, 255, 255, 0.08);
@@ -230,418 +177,162 @@
         margin-top: 2rem;
       }
 
-      @media (max-width: 768px) {
-        .hero {
-          padding-top: 2.75rem;
+      @media (max-width: 640px) {
+        .nav {
+          justify-content: center;
+          text-align: center;
         }
 
-        nav .btn {
+        .btn {
           width: 100%;
-          margin-top: 0.5rem;
-        }
-
-        .pill {
-          flex-direction: column;
-          align-items: flex-start;
         }
       }
     </style>
   </head>
   <body>
     <header>
-      <nav class="container py-3 d-flex flex-wrap align-items-center justify-content-between">
-        <div class="d-flex align-items-center gap-3">
-          <span class="badge-soft">Live</span>
-          <a class="navbar-brand fs-4" href="#top">FD Games</a>
-        </div>
-        <div class="d-flex flex-wrap gap-2">
-          <a class="btn btn-ghost" href="#games">View games</a>
-          <a class="btn btn-ghost" href="#build-tracker">Game checklist</a>
-          <a class="btn btn-cta" href="#checklist">Session checklist</a>
-        </div>
-      </nav>
+      <div class="nav">
+        <span class="brand">FD Games</span>
+        <a class="btn secondary" href="README.md">Project notes</a>
+      </div>
     </header>
 
-    <main id="top" class="container">
+    <main class="container">
       <section class="hero">
-        <div class="pill mb-3">
-          <span class="tag">Training hub</span>
-          <span class="muted">Navigate games, policies, and readiness steps without running a dev server.</span>
+        <div>
+          <p class="tag">Prototype hub</p>
+          <h1>10 kiosk-friendly training prototypes.</h1>
+          <p>
+            Launch any prototype or open the brief for details. Every title below is now playable so you can keep iterating an
+            interactive slice.
+          </p>
+          <div class="actions">
+            <a class="btn" href="#games">Browse the lineup</a>
+            <a class="btn secondary" href="start/README.md">View all briefs</a>
+          </div>
         </div>
-        <h1>Launch customer-ready sessions in minutes.</h1>
-        <p>
-          Use the FD Games hub to practice scenarios, reinforce policy knowledge, and track what’s ready for the next
-          shift. Everything here is plain HTML, CSS, and JavaScript—open the file and start.
-        </p>
-        <div class="d-flex flex-wrap gap-3 mt-4">
-          <a class="btn btn-cta" href="#games">Start a training game</a>
-          <a class="btn btn-ghost" href="#roadmap">Review roadmap</a>
-        </div>
-        <div class="row g-3 mt-4">
-          <div class="col-md-4">
-            <div class="gradient-card h-100">
-              <p class="muted mb-1">Active modules</p>
-              <h3 class="mb-0">Furniture Game + Policies</h3>
-              <p class="muted mb-0">Jump straight into a scenario or brush up on a policy callout.</p>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="tile h-100">
-              <p class="muted mb-1">Deployment</p>
-              <h3 class="mb-0">Static landing page</h3>
-              <p class="muted mb-0">No server needed. Open <code>index.html</code> directly to explore.</p>
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="tile h-100">
-              <p class="muted mb-1">Next</p>
-              <h3 class="mb-0">Start folder + docs</h3>
-              <p class="muted mb-0">Organize each game and keep a running checklist as we build.</p>
-            </div>
-          </div>
+        <div class="panel">
+          <h3 style="margin: 0 0 0.35rem;">What’s here</h3>
+          <p class="muted" style="margin: 0;">Simple HTML pages for each game plus the original React source in <code>src</code> if you need it.</p>
+          <ul class="muted" style="padding-left: 1.2rem; line-height: 1.6; margin-top: 0.75rem;">
+            <li>Open any game page directly—no dev server required.</li>
+            <li>Readmes outline goals, controls, and scoring for every title.</li>
+            <li>Use this landing page as the index for demos or handoff.</li>
+          </ul>
         </div>
       </section>
 
-      <section id="build-tracker" class="mb-5">
-        <p class="tag mb-2">Build tracker</p>
-        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
-          <h2 class="section-title mb-0">Game checklist</h2>
-          <span class="muted">Progress saves locally so you can keep the kiosk plan updated.</span>
+      <section id="games" style="margin-top: 2rem;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;">
+          <h2 style="margin: 0; letter-spacing: -0.01em;">Prototype overview</h2>
+          <span class="pill">10 titles • 10 prototypes</span>
         </div>
-        <div class="card-grid checklist">
-          <label class="item" for="build-couch-stack">
-            <input id="build-couch-stack" type="checkbox" data-key="build-couch-stack" />
-            <div>
-              <h4 class="mb-1">Couch Stack</h4>
-              <p class="muted mb-0">Drag/drop balance prototype with FD silhouettes and perfect-placement bonuses.</p>
+        <div class="grid" style="margin-top: 1.25rem;">
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+              <h3>Couch Stack</h3>
+              <span class="pill" style="border-color: rgba(102, 224, 255, 0.35); color: #66e0ff;">Prototype</span>
             </div>
-          </label>
-          <label class="item" for="build-room-rush">
-            <input id="build-room-rush" type="checkbox" data-key="build-room-rush" />
-            <div>
-              <h4 class="mb-1">Room Rush</h4>
-              <p class="muted mb-0">Timed checklist puzzle with snap-to-grid placement and style-matching scores.</p>
+            <p class="muted">Drop traveling couches onto the stack without losing balance. Tight placement trims each block.</p>
+            <div class="actions">
+              <a class="btn" href="games/couch-stack/index.html">Play</a>
+              <a class="btn secondary" href="start/couch-stack/README.md">Readme</a>
             </div>
-          </label>
-          <label class="item" for="build-find-deal">
-            <input id="build-find-deal" type="checkbox" data-key="build-find-deal" />
-            <div>
-              <h4 class="mb-1">Find the Deal</h4>
-              <p class="muted mb-0">Hidden-object scenes with weekly promo swaps and hint timers.</p>
-            </div>
-          </label>
-          <label class="item" for="build-memory-match">
-            <input id="build-memory-match" type="checkbox" data-key="build-memory-match" />
-            <div>
-              <h4 class="mb-1">Memory Match</h4>
-              <p class="muted mb-0">Tile flips using FD logos, fabrics, and silhouettes with Hard mode grids.</p>
-            </div>
-          </label>
-          <label class="item" for="build-swipe-sort">
-            <input id="build-swipe-sort" type="checkbox" data-key="build-swipe-sort" />
-            <div>
-              <h4 class="mb-1">Swipe Sort</h4>
-              <p class="muted mb-0">Swipe/tap sorting for Bedroom vs Living Room, with streak multipliers.</p>
-            </div>
-          </label>
-          <label class="item" for="build-price-right">
-            <input id="build-price-right" type="checkbox" data-key="build-price-right" />
-            <div>
-              <h4 class="mb-1">Price Is Right</h4>
-              <p class="muted mb-0">Pricing guesses with huge buttons and streak bonuses.</p>
-            </div>
-          </label>
-          <label class="item" for="build-delivery-dash">
-            <input id="build-delivery-dash" type="checkbox" data-key="build-delivery-dash" />
-            <div>
-              <h4 class="mb-1">Delivery Dash</h4>
-              <p class="muted mb-0">Lane runner with FD-branded truck wraps and flawless-run bonuses.</p>
-            </div>
-          </label>
-          <label class="item" for="build-rug-runner">
-            <input id="build-rug-runner" type="checkbox" data-key="build-rug-runner" />
-            <div>
-              <h4 class="mb-1">Rug Runner</h4>
-              <p class="muted mb-0">Endless runner collecting décor pickups with combo paths.</p>
-            </div>
-          </label>
-          <label class="item" for="build-build-room">
-            <input id="build-build-room" type="checkbox" data-key="build-build-room" />
-            <div>
-              <h4 class="mb-1">Build-a-Room</h4>
-              <p class="muted mb-0">Before/after upgrades with objective scoring and comfort meter.</p>
-            </div>
-          </label>
-          <label class="item" for="build-sofa-tetris">
-            <input id="build-sofa-tetris" type="checkbox" data-key="build-sofa-tetris" />
-            <div>
-              <h4 class="mb-1">Sofa Tetris</h4>
-              <p class="muted mb-0">Furniture silhouette block-fitting with combo clears.</p>
-            </div>
-          </label>
-        </div>
-      </section>
+          </div>
 
-      <section id="games" class="mb-5">
-        <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
-          <div>
-            <p class="tag mb-2">Games</p>
-            <h2 class="section-title mb-1">Training lineup</h2>
-            <p class="muted mb-0">Touch-friendly kiosk concepts with FD-branded assets and scorekeeping. Open a skeleton to start prototyping.</p>
-          </div>
-          <a class="btn btn-ghost" href="start/README.md">Open start folder</a>
-        </div>
-        <div class="card-grid">
-          <div class="tile">
-            <div class="d-flex align-items-center justify-content-between mb-2">
-              <h3 class="mb-0">Couch Stack</h3>
-              <span class="tag">Balance / Placement</span>
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+              <h3>Room Rush</h3>
+              <span class="pill" style="border-color: rgba(102, 224, 255, 0.35); color: #66e0ff;">Prototype</span>
             </div>
-            <p class="muted">Drag-and-drop furniture silhouettes onto a moving platform and keep the stack from tipping.</p>
-            <p class="muted mb-0"><strong>Scoring:</strong> Time survived + items placed + perfect placement bonuses.</p>
-            <div class="d-flex flex-wrap gap-2 mt-3">
-              <a class="btn btn-cta btn-sm" href="games/couch-stack/index.html">Open skeleton</a>
-              <a class="btn btn-ghost btn-sm" href="start/couch-stack/README.md">View brief</a>
+            <p class="muted">Fill a 4x4 room with the right furniture before the clock expires. Select pieces, tap cells, and beat the best time.</p>
+            <div class="actions">
+              <a class="btn" href="games/room-rush/index.html">Play</a>
+              <a class="btn secondary" href="start/room-rush/README.md">Readme</a>
             </div>
           </div>
-          <div class="tile">
-            <div class="d-flex align-items-center justify-content-between mb-2">
-              <h3 class="mb-0">Room Rush</h3>
-              <span class="tag">Timed design</span>
-            </div>
-            <p class="muted">Fill a blank room from a checklist before time runs out using snap-to-grid placement.</p>
-            <p class="muted mb-0"><strong>Scoring:</strong> Speed + style match + no overlaps.</p>
-            <div class="d-flex flex-wrap gap-2 mt-3">
-              <a class="btn btn-cta btn-sm" href="games/room-rush/index.html">Open skeleton</a>
-              <a class="btn btn-ghost btn-sm" href="start/room-rush/README.md">View brief</a>
-            </div>
-          </div>
-          <div class="tile">
-            <div class="d-flex align-items-center justify-content-between mb-2">
-              <h3 class="mb-0">Find the Deal</h3>
-              <span class="tag">Hidden object</span>
-            </div>
-            <p class="muted">Tap the hidden sale tag or featured product inside a crowded showroom scene.</p>
-            <p class="muted mb-0"><strong>Scoring:</strong> Fastest time with fewer hints.</p>
-            <div class="d-flex flex-wrap gap-2 mt-3">
-              <a class="btn btn-cta btn-sm" href="games/find-the-deal/index.html">Open skeleton</a>
-              <a class="btn btn-ghost btn-sm" href="start/find-the-deal/README.md">View brief</a>
-            </div>
-          </div>
-          <div class="tile">
-            <div class="d-flex align-items-center justify-content-between mb-2">
-              <h3 class="mb-0">Memory Match</h3>
-              <span class="tag">Best starter</span>
-            </div>
-            <p class="muted">Flip tiles to match pairs of FD silhouettes, fabrics, or logos. Hard mode supports larger grids.</p>
-            <p class="muted mb-0"><strong>Scoring:</strong> Fewer moves + faster time; streaks for consecutive matches.</p>
-            <div class="d-flex flex-wrap gap-2 mt-3">
-              <a class="btn btn-cta btn-sm" href="games/memory-match-furniture-edition/index.html">Open skeleton</a>
-              <a class="btn btn-ghost btn-sm" href="start/memory-match-furniture-edition/README.md">View brief</a>
-            </div>
-          </div>
-          <div class="tile">
-            <div class="d-flex align-items-center justify-content-between mb-2">
-              <h3 class="mb-0">Swipe Sort</h3>
-              <span class="tag">Best starter</span>
-            </div>
-            <p class="muted">Swipe items into Bedroom vs Living Room (and optional Outdoor/Office/Kids) with streak multipliers.</p>
-            <p class="muted mb-0"><strong>Scoring:</strong> Accuracy + streak multiplier + optional time bonus.</p>
-            <div class="d-flex flex-wrap gap-2 mt-3">
-              <a class="btn btn-cta btn-sm" href="games/swipe-sort/index.html">Open skeleton</a>
-              <a class="btn btn-ghost btn-sm" href="start/swipe-sort/README.md">View brief</a>
-            </div>
-          </div>
-          <div class="tile">
-            <div class="d-flex align-items-center justify-content-between mb-2">
-              <h3 class="mb-0">Price Is Right</h3>
-              <span class="tag">Pricing challenge</span>
-            </div>
-            <p class="muted">Guess if the item is above/below a price or pick the closest range using huge buttons.</p>
-            <p class="muted mb-0"><strong>Scoring:</strong> Correct streaks + time bonus.</p>
-            <div class="d-flex flex-wrap gap-2 mt-3">
-              <a class="btn btn-cta btn-sm" href="games/price-is-right-furniture-edition/index.html">Open skeleton</a>
-              <a class="btn btn-ghost btn-sm" href="start/price-is-right-furniture-edition/README.md">View brief</a>
-            </div>
-          </div>
-          <div class="tile">
-            <div class="d-flex align-items-center justify-content-between mb-2">
-              <h3 class="mb-0">Delivery Dash</h3>
-              <span class="tag">Lane runner</span>
-            </div>
-            <p class="muted">Swipe lanes as a delivery truck to dodge traffic and collect 5-star reviews.</p>
-            <p class="muted mb-0"><strong>Scoring:</strong> Distance + pickups; flawless runs score extra.</p>
-            <div class="d-flex flex-wrap gap-2 mt-3">
-              <a class="btn btn-cta btn-sm" href="games/delivery-dash/index.html">Open skeleton</a>
-              <a class="btn btn-ghost btn-sm" href="start/delivery-dash/README.md">View brief</a>
-            </div>
-          </div>
-          <div class="tile">
-            <div class="d-flex align-items-center justify-content-between mb-2">
-              <h3 class="mb-0">Rug Runner</h3>
-              <span class="tag">Endless runner</span>
-            </div>
-            <p class="muted">Roll out a rug, dodge obstacles, and collect pillows/throws for combo pickups.</p>
-            <p class="muted mb-0"><strong>Scoring:</strong> Distance + combo bonuses + streaks.</p>
-            <div class="d-flex flex-wrap gap-2 mt-3">
-              <a class="btn btn-cta btn-sm" href="games/rug-runner/index.html">Open skeleton</a>
-              <a class="btn btn-ghost btn-sm" href="start/rug-runner/README.md">View brief</a>
-            </div>
-          </div>
-          <div class="tile">
-            <div class="d-flex align-items-center justify-content-between mb-2">
-              <h3 class="mb-0">Build-a-Room</h3>
-              <span class="tag">Before/After</span>
-            </div>
-            <p class="muted">Upgrade an ugly room by dragging improvements to raise its comfort score and objectives.</p>
-            <p class="muted mb-0"><strong>Scoring:</strong> Objective completion + speed; leaderboards for top makeovers.</p>
-            <div class="d-flex flex-wrap gap-2 mt-3">
-              <a class="btn btn-cta btn-sm" href="games/build-a-room/index.html">Open skeleton</a>
-              <a class="btn btn-ghost btn-sm" href="start/build-a-room/README.md">View brief</a>
-            </div>
-          </div>
-          <div class="tile">
-            <div class="d-flex align-items-center justify-content-between mb-2">
-              <h3 class="mb-0">Sofa Tetris</h3>
-              <span class="tag">Block fitting</span>
-            </div>
-            <p class="muted">Classic line-clearing with furniture silhouettes (sectionals, chairs, ottomans).</p>
-            <p class="muted mb-0"><strong>Scoring:</strong> Lines cleared + combo bonuses; speed ramps as you level up.</p>
-            <div class="d-flex flex-wrap gap-2 mt-3">
-              <a class="btn btn-cta btn-sm" href="games/sofa-tetris/index.html">Open skeleton</a>
-              <a class="btn btn-ghost btn-sm" href="start/sofa-tetris/README.md">View brief</a>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      <section id="checklist" class="mb-5">
-        <p class="tag mb-2">Session readiness</p>
-        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
-          <h2 class="section-title mb-0">Daily checklist</h2>
-          <span class="muted">Track progress locally. Items stay checked on refresh.</span>
-        </div>
-        <div class="card-grid checklist">
-          <label class="item" for="check-1">
-            <input id="check-1" type="checkbox" data-key="check-prep" />
-            <div>
-              <h4 class="mb-1">Prep the floor narrative</h4>
-              <p class="muted mb-0">Pick a lead product and set two upsell targets before you start.</p>
+          <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+              <h3>Find the Deal</h3>
+              <span class="pill" style="border-color: rgba(102, 224, 255, 0.35); color: #66e0ff;">Prototype</span>
             </div>
-          </label>
-          <label class="item" for="check-2">
-            <input id="check-2" type="checkbox" data-key="check-game" />
-            <div>
-              <h4 class="mb-1">Run the Furniture Game</h4>
-              <p class="muted mb-0">Finish one full scenario set and note any objection you missed.</p>
+            <p class="muted">Search a stylized showroom and tap the hidden sale tag. Time your find and compare against your best run.</p>
+            <div class="actions">
+              <a class="btn" href="games/find-the-deal/index.html">Play</a>
+              <a class="btn secondary" href="start/find-the-deal/README.md">Readme</a>
             </div>
-          </label>
-          <label class="item" for="check-3">
-            <input id="check-3" type="checkbox" data-key="check-policy" />
-            <div>
-              <h4 class="mb-1">Policy refresh</h4>
-              <p class="muted mb-0">Review delivery, returns, and financing policies with today’s offer stack.</p>
-            </div>
-          </label>
-          <label class="item" for="check-4">
-            <input id="check-4" type="checkbox" data-key="check-note" />
-            <div>
-              <h4 class="mb-1">Capture learnings</h4>
-              <p class="muted mb-0">Log one winning phrase and one follow-up question to try on the floor.</p>
-            </div>
-          </label>
-        </div>
-      </section>
+          </div>
 
-      <section id="roadmap" class="mb-5">
-        <p class="tag mb-2">Roadmap</p>
-        <div class="row g-3">
-          <div class="col-md-6">
-            <div class="tile h-100">
-              <h2 class="section-title">What’s next</h2>
-              <div class="timeline">
-                <div class="step">
-                  <span class="dot"></span>
-                  <h4 class="mb-1">Create `start/` folder</h4>
-                  <p class="muted mb-0">Package each game with its own README, assets, and quickstart instructions.</p>
-                </div>
-                <div class="step">
-                  <span class="dot"></span>
-                  <h4 class="mb-1">Add inventory scenarios</h4>
-                  <p class="muted mb-0">New decision branches on inventory checks and delivery slots.</p>
-                </div>
-                <div class="step">
-                  <span class="dot"></span>
-                  <h4 class="mb-1">Embed call scripts</h4>
-                  <p class="muted mb-0">Drop-in scripts for call-backs and upsell nudges during the game.</p>
-                </div>
-              </div>
+          <div class="card">
+            <h3>Memory Match: Furniture Edition</h3>
+            <p class="muted">Flip tiles to pair silhouettes and fabrics. Try 4x4 or 6x6 boards with move and time tracking.</p>
+            <div class="actions">
+              <a class="btn secondary" href="games/memory-match-furniture-edition/index.html">Play prototype</a>
+              <a class="btn secondary" href="start/memory-match-furniture-edition/README.md">Readme</a>
             </div>
           </div>
-          <div class="col-md-6">
-            <div class="banner h-100">
-              <h3 class="mb-2">Need the old app?</h3>
-              <p class="muted">
-                The prior React build is still in this repository. For now, the landing page runs without a dev server so you can
-                demo content instantly.
-              </p>
-              <ul class="mb-3 muted" style="padding-left: 1.1rem;">
-                <li>Open <code>src</code> for the React components and styles.</li>
-                <li>Use <code>npm install</code> and <code>npm run dev</code> later if you want the interactive build back.</li>
-              </ul>
-              <div class="d-flex flex-wrap gap-2">
-                <a class="btn btn-cta" href="#top">Back to top</a>
-                <a class="btn btn-ghost" href="README.md">Read the notes</a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      <section class="mb-5">
-        <div class="tile d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
-          <div>
-            <h3 class="mb-1">Ready to practice?</h3>
-            <p class="muted mb-0">Pick a checklist item, open the Furniture Game, and capture one new takeaway today.</p>
+          <div class="card">
+            <h3>Swipe Sort: Bedroom vs Living Room</h3>
+            <p class="muted">Swipe or tap cards into the right category with streak bonuses. Keep the deck going for a high streak.</p>
+            <div class="actions">
+              <a class="btn secondary" href="games/swipe-sort/index.html">Play prototype</a>
+              <a class="btn secondary" href="start/swipe-sort/README.md">Readme</a>
+            </div>
           </div>
-          <div class="d-flex gap-2 flex-wrap">
-            <a class="btn btn-cta" href="#games">Start a game</a>
-            <a class="btn btn-ghost" href="#checklist">Update checklist</a>
+
+          <div class="card">
+            <h3>Price Is Right: Furniture Edition</h3>
+            <p class="muted">Guess if each price is higher or lower than the tag. Streaks build score; see real prices after each guess.</p>
+            <div class="actions">
+              <a class="btn secondary" href="games/price-is-right-furniture-edition/index.html">Play prototype</a>
+              <a class="btn secondary" href="start/price-is-right-furniture-edition/README.md">Readme</a>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Delivery Dash</h3>
+            <p class="muted">Three-lane dodger with cones and pickups. Swap lanes to keep your hearts and chase your best score.</p>
+            <div class="actions">
+              <a class="btn secondary" href="games/delivery-dash/index.html">Play prototype</a>
+              <a class="btn secondary" href="start/delivery-dash/README.md">Readme</a>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Rug Runner</h3>
+            <p class="muted">Endless sprint with jumps, décor pickups, and an energy meter to beat before/after distances.</p>
+            <div class="actions">
+              <a class="btn secondary" href="games/rug-runner/index.html">Play prototype</a>
+              <a class="btn secondary" href="start/rug-runner/README.md">Readme</a>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Build-a-Room: Before/After</h3>
+            <p class="muted">Toggle hotspots to apply upgrades and watch the score climb. Hit 100% to finish your after view.</p>
+            <div class="actions">
+              <a class="btn secondary" href="games/build-a-room/index.html">Play prototype</a>
+              <a class="btn secondary" href="start/build-a-room/README.md">Readme</a>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Sofa Tetris</h3>
+            <p class="muted">Line-clearing prototype with falling sofa shapes, scoring, and soft drops. Rotate and stack to stay alive.</p>
+            <div class="actions">
+              <a class="btn secondary" href="games/sofa-tetris/index.html">Play prototype</a>
+              <a class="btn secondary" href="start/sofa-tetris/README.md">Readme</a>
+            </div>
           </div>
         </div>
       </section>
     </main>
 
-    <footer class="text-center">
-      <p class="mb-1">FD Games Training Hub</p>
-      <p class="mb-0">Static HTML, CSS, and JavaScript so you can launch the landing page instantly.</p>
+    <footer>
+      <p style="margin: 0;">FD Games</p>
+      <p style="margin: 0;">Static HTML hub with quick links to every prototype and brief.</p>
     </footer>
-
-    <script>
-      // Persist checklist state locally without any server or build tools.
-      const storageKey = 'fd-games-checklist';
-      const stored = JSON.parse(localStorage.getItem(storageKey) || '{}');
-      document.querySelectorAll('[data-key]').forEach((input) => {
-        const key = input.getAttribute('data-key');
-        if (stored[key]) {
-          input.checked = true;
-        }
-        input.addEventListener('change', () => {
-          stored[key] = input.checked;
-          localStorage.setItem(storageKey, JSON.stringify(stored));
-        });
-      });
-
-      // Smooth scroll for in-page links
-      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-        anchor.addEventListener('click', (e) => {
-          const target = document.querySelector(anchor.getAttribute('href'));
-          if (target) {
-            e.preventDefault();
-            target.scrollIntoView({ behavior: 'smooth' });
-          }
-        });
-      });
-    </script>
   </body>
 </html>

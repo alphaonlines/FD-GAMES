@@ -3,22 +3,71 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Build-a-Room | FD Games</title>
+    <title>Build-a-Room Prototype | FD Games</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="../common.css" />
+    <style>
+      .room {
+        position: relative;
+        height: 240px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: linear-gradient(180deg, rgba(102, 224, 255, 0.08), rgba(255, 255, 255, 0.03));
+        overflow: hidden;
+        display: grid;
+        place-items: center;
+      }
+
+      .tag {
+        position: absolute;
+        padding: 0.4rem 0.6rem;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 120ms ease, opacity 120ms ease;
+      }
+
+      .tag.active {
+        background: rgba(34, 197, 94, 0.18);
+        border-color: rgba(34, 197, 94, 0.4);
+        transform: translateY(-2px);
+      }
+
+      .palette {
+        display: grid;
+        gap: 0.6rem;
+      }
+
+      .progress {
+        width: 100%;
+        height: 10px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.08);
+        overflow: hidden;
+      }
+
+      .progress span {
+        display: block;
+        height: 100%;
+        background: linear-gradient(120deg, #66e0ff, #3b82f6);
+        width: 0;
+      }
+    </style>
   </head>
   <body>
     <header>
       <div class="navbar">
         <div class="nav-left">
           <span class="brand">FD Games</span>
-          <span class="pill">Build-a-Room</span>
+          <span class="pill">Prototype</span>
         </div>
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
           <a class="btn secondary" href="../../index.html">Back to hub</a>
-          <button class="btn outline" data-action="reset">Reset state</button>
+          <button class="btn outline" data-action="reset">Reset room</button>
         </div>
       </div>
     </header>
@@ -27,66 +76,97 @@
       <section class="hero">
         <div>
           <p class="badge">Before / After</p>
-          <h1>Upgrade a sad room into a top makeover.</h1>
-          <p>
-            Drag upgrades into the scene and raise the comfort score. Track objectives, timers, and leaderboards for top
-            makeovers.
-          </p>
-          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem;">
-            <button class="btn" data-action="start">Start makeover</button>
-            <a class="btn secondary" href="../../start/build-a-room/README.md">View brief</a>
+          <h1>Build-a-Room prototype</h1>
+          <p>Add upgrades to boost the score. Toggle each hotspot to apply an improvement and aim for 100% impact.</p>
+          <div class="hud" style="margin-top: 0.6rem;">
+            <div class="stat"><span>Score</span><strong data-score>0%</strong></div>
+            <div class="stat"><span>Applied</span><strong data-applied>0/6</strong></div>
+            <div class="stat"><span>Best</span><strong data-best>0%</strong></div>
           </div>
-          <div class="status" style="margin-top: 1rem;">
-            <span class="status-indicator"></span>
-            <span data-status>Waiting for upgrade set.</span>
+          <p class="muted" style="margin-top: 0.6rem;" data-status>Tap a label to apply its upgrade.</p>
+          <div style="margin-top: 0.75rem;">
+            <div class="progress"><span data-progress></span></div>
           </div>
         </div>
         <div class="panel">
-          <h3 class="section-title">Before/After canvas</h3>
-          <p class="muted">Use this area for draggable upgrades and progress meters.</p>
-          <div class="placeholder-area">Makeover canvas placeholder.</div>
+          <h3 class="section-title">Room canvas</h3>
+          <div class="room" id="room"></div>
         </div>
       </section>
 
-      <section style="margin-top: 1.5rem;" class="subgrid">
-        <div class="panel">
-          <h3 class="section-title">Build checklist</h3>
-          <div class="checklist" style="display: grid; gap: 0.75rem;">
-            <label><input type="checkbox" data-check="objectives" />Objective list with comfort points.</label>
-            <label><input type="checkbox" data-check="drag" />Drag/drop upgrades with snap targets.</label>
-            <label><input type="checkbox" data-check="score" />Score by objectives + speed bonus.</label>
-          </div>
-        </div>
-        <div class="panel">
-          <h3 class="section-title">Design notes</h3>
-          <ul class="muted" style="line-height: 1.6; padding-left: 1.1rem;">
-            <li>Use before/after art for clear payoff.</li>
-            <li>Optional comfort meter animation.</li>
-            <li>Leaderboard for top makeovers.</li>
-          </ul>
-        </div>
-        <div class="panel">
-          <h3 class="section-title">Session notes</h3>
-          <p class="muted">Fast jot for findings or tweaks. Saved locally.</p>
-          <textarea data-note rows="6" style="width: 100%; border-radius: 12px; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: var(--text);"></textarea>
-        </div>
-      </section>
-
-      <section style="margin-top: 1.5rem;" class="panel">
-        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
-          <div>
-            <h3 class="section-title">Activity log</h3>
-            <p class="muted" style="margin: 0;">Track interactions while wiring objectives.</p>
-          </div>
-          <a class="btn secondary" href="../../README.md">Repo notes</a>
-        </div>
-        <ul class="log" data-log style="margin-top: 0.75rem;"></ul>
+      <section style="margin-top: 1.2rem;" class="panel">
+        <h3 class="section-title">Notes</h3>
+        <textarea data-note rows="4" style="width: 100%; border-radius: 12px; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: var(--text);"></textarea>
       </section>
     </main>
 
-    <script src="../common.js"></script>
     <script>
-      initGameSkeleton({ slug: 'build-a-room', title: 'Build-a-Room', defaultStatus: 'Makeover canvas pending.' });
+      const room = document.getElementById('room');
+      const statusEl = document.querySelector('[data-status]');
+      const scoreEl = document.querySelector('[data-score]');
+      const appliedEl = document.querySelector('[data-applied]');
+      const bestEl = document.querySelector('[data-best]');
+      const progressBar = document.querySelector('[data-progress]');
+      const note = document.querySelector('[data-note]');
+
+      const spots = [
+        { label: 'Paint accent wall', x: '20%', y: '20%', value: 18 },
+        { label: 'Statement rug', x: '62%', y: '32%', value: 16 },
+        { label: 'Lighting refresh', x: '38%', y: '10%', value: 14 },
+        { label: 'Greenery', x: '12%', y: '58%', value: 12 },
+        { label: 'Storage console', x: '70%', y: '62%', value: 20 },
+        { label: 'Wall art', x: '46%', y: '44%', value: 20 },
+      ];
+
+      let best = Number(localStorage.getItem('fd-room-best') || 0);
+
+      function renderSpots() {
+        room.innerHTML = '';
+        spots.forEach((spot, idx) => {
+          const btn = document.createElement('button');
+          btn.className = 'tag';
+          btn.style.left = spot.x;
+          btn.style.top = spot.y;
+          btn.textContent = spot.label;
+          if (spot.active) btn.classList.add('active');
+          btn.addEventListener('click', () => toggleSpot(idx));
+          room.appendChild(btn);
+        });
+      }
+
+      function updateHUD() {
+        const applied = spots.filter((s) => s.active).length;
+        const score = spots.filter((s) => s.active).reduce((sum, s) => sum + s.value, 0);
+        scoreEl.textContent = `${score}%`;
+        appliedEl.textContent = `${applied}/${spots.length}`;
+        progressBar.style.width = `${score}%`;
+        bestEl.textContent = `${best}%`;
+        return score;
+      }
+
+      function toggleSpot(index) {
+        spots[index].active = !spots[index].active;
+        renderSpots();
+        const score = updateHUD();
+        statusEl.textContent = `${spots[index].label} ${spots[index].active ? 'added' : 'removed'}.`;
+        best = Math.max(best, score);
+        localStorage.setItem('fd-room-best', best);
+        bestEl.textContent = `${best}%`;
+      }
+
+      function reset() {
+        spots.forEach((s) => (s.active = false));
+        renderSpots();
+        updateHUD();
+        statusEl.textContent = 'Room reset. Apply upgrades to build the after view.';
+      }
+
+      document.querySelector('[data-action="reset"]').addEventListener('click', reset);
+      note.value = localStorage.getItem('fd-room-note') || '';
+      note.addEventListener('input', () => localStorage.setItem('fd-room-note', note.value));
+
+      renderSpots();
+      updateHUD();
     </script>
   </body>
 </html>

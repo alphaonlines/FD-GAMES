@@ -8,6 +8,99 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="../common.css" />
+    <style>
+      .scene {
+        position: relative;
+        height: 360px;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: linear-gradient(135deg, rgba(102, 224, 255, 0.12), rgba(12, 18, 40, 0.85));
+        overflow: hidden;
+        cursor: crosshair;
+      }
+
+      .decor {
+        position: absolute;
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 10px 26px rgba(0, 0, 0, 0.25);
+      }
+
+      .decor.label {
+        display: grid;
+        place-items: center;
+        color: var(--text);
+        font-weight: 700;
+      }
+
+      .tag {
+        position: absolute;
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        background: linear-gradient(145deg, #f97316, #fbbf24);
+        display: grid;
+        place-items: center;
+        color: #0f172a;
+        font-weight: 800;
+        opacity: 0;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        box-shadow: 0 10px 30px rgba(249, 168, 38, 0.35);
+      }
+
+      .tag.visible {
+        opacity: 1;
+        transform: scale(1.05);
+      }
+
+      .hint-ring {
+        position: absolute;
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        border: 2px dashed rgba(255, 255, 255, 0.6);
+        pointer-events: none;
+        opacity: 0;
+        animation: pulse 1.8s infinite;
+      }
+
+      .hint-ring.show {
+        opacity: 1;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(0.9);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+        100% {
+          transform: scale(0.9);
+        }
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 0.75rem;
+        margin-top: 0.75rem;
+      }
+
+      .stat {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 0.75rem 0.9rem;
+        display: grid;
+        gap: 0.2rem;
+      }
+
+      .stat span {
+        color: var(--muted);
+      }
+    </style>
   </head>
   <body>
     <header>
@@ -18,7 +111,7 @@
         </div>
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
           <a class="btn secondary" href="../../index.html">Back to hub</a>
-          <button class="btn outline" data-action="reset">Reset state</button>
+          <button class="btn outline" data-action="reset">Reset</button>
         </div>
       </div>
     </header>
@@ -27,66 +120,188 @@
       <section class="hero">
         <div>
           <p class="badge">Hidden object</p>
-          <h1>Spot the sale tag before hints appear.</h1>
+          <h1>Spot the hidden sale tag.</h1>
           <p>
-            Wire your showroom image, tap targets, hint timer, and scoring for speed and fewer hints. The skeleton keeps
-            your controls, notes, and progress local.
+            Explore the stylized showroom and tap where you think the promo tag lives. Each run randomizes the target and sets a
+            new hint timer.
           </p>
           <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem;">
             <button class="btn" data-action="start">Start search</button>
-            <a class="btn secondary" href="../../start/find-the-deal/README.md">View brief</a>
+            <a class="btn secondary" href="../../start/find-the-deal/README.md">Readme</a>
           </div>
-          <div class="status" style="margin-top: 1rem;">
+          <div class="status" style="margin-top: 0.75rem;">
             <span class="status-indicator"></span>
-            <span data-status>Awaiting scene drop.</span>
+            <div>
+              <strong data-status>Waiting to start.</strong>
+              <div class="muted" data-message>Tap anywhere in the scene once the round begins.</div>
+            </div>
           </div>
         </div>
         <div class="panel">
-          <h3 class="section-title">Scene</h3>
-          <p class="muted">Drop in your showroom art and place coordinates for the hidden tag.</p>
-          <div class="placeholder-area">Image placeholder (tap to reveal).</div>
-        </div>
-      </section>
-
-      <section style="margin-top: 1.5rem;" class="subgrid">
-        <div class="panel">
-          <h3 class="section-title">Build checklist</h3>
-          <div class="checklist" style="display: grid; gap: 0.75rem;">
-            <label><input type="checkbox" data-check="image" />Load background image and hotspots.</label>
-            <label><input type="checkbox" data-check="hints" />Hint timer + pulse effect after delay.</label>
-            <label><input type="checkbox" data-check="scoring" />Score by time + deductions per hint.</label>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap;">
+            <div>
+              <h3 class="section-title">Showroom scene</h3>
+              <p class="muted" style="margin: 0;">The tag hides on one of the vignette clusters below.</p>
+            </div>
+            <div class="pill-small">
+              Hint appears after <span data-hint-time>10s</span>
+            </div>
+          </div>
+          <div class="scene" data-scene>
+            <div class="decor" style="width: 140px; height: 180px; left: 30px; bottom: 30px;"></div>
+            <div class="decor" style="width: 110px; height: 120px; left: 90px; top: 50px;"></div>
+            <div class="decor" style="width: 120px; height: 150px; right: 40px; bottom: 28px;"></div>
+            <div class="decor" style="width: 130px; height: 110px; right: 90px; top: 36px;"></div>
+            <div class="decor label" style="width: 90px; height: 70px; left: 50%; top: 48%; transform: translate(-50%, -50%);">
+              Sofa Set
+            </div>
+            <div class="decor label" style="width: 60px; height: 60px; left: 20%; top: 20%;">Lamps</div>
+            <div class="decor label" style="width: 80px; height: 60px; right: 18%; top: 16%;">Throws</div>
+            <div class="tag" data-tag>SALE</div>
+            <div class="hint-ring" data-hint></div>
+          </div>
+          <div class="stats">
+            <div class="stat">
+              <strong>Attempts</strong>
+              <span data-attempts>0</span>
+            </div>
+            <div class="stat">
+              <strong>Best time</strong>
+              <span data-best>—</span>
+            </div>
+            <div class="stat">
+              <strong>Last run</strong>
+              <span data-last>—</span>
+            </div>
           </div>
         </div>
-        <div class="panel">
-          <h3 class="section-title">Design notes</h3>
-          <ul class="muted" style="line-height: 1.6; padding-left: 1.1rem;">
-            <li>Cycle weekly art to keep the challenge fresh.</li>
-            <li>Optional magnifier for accessibility on kiosks.</li>
-            <li>Capture taps to power a simple leaderboard.</li>
-          </ul>
-        </div>
-        <div class="panel">
-          <h3 class="section-title">Session notes</h3>
-          <p class="muted">Fast jot for findings or tweaks. Saved locally.</p>
-          <textarea data-note rows="6" style="width: 100%; border-radius: 12px; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: var(--text);"></textarea>
-        </div>
-      </section>
-
-      <section style="margin-top: 1.5rem;" class="panel">
-        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
-          <div>
-            <h3 class="section-title">Activity log</h3>
-            <p class="muted" style="margin: 0;">Use this for quick tap/score debugging.</p>
-          </div>
-          <a class="btn secondary" href="../../README.md">Repo notes</a>
-        </div>
-        <ul class="log" data-log style="margin-top: 0.75rem;"></ul>
       </section>
     </main>
 
-    <script src="../common.js"></script>
     <script>
-      initGameSkeleton({ slug: 'find-the-deal', title: 'Find the Deal', defaultStatus: 'Ready for showroom art.' });
+      const spots = [
+        { id: 'left-plant', area: [12, 36, 22, 38], label: 'Plant cluster' },
+        { id: 'lamps', area: [20, 18, 30, 32], label: 'Lamp vignette' },
+        { id: 'sofa', area: [46, 50, 62, 70], label: 'Sofa set' },
+        { id: 'throws', area: [68, 18, 82, 34], label: 'Throw pillows' },
+        { id: 'right-plant', area: [72, 48, 88, 76], label: 'Décor shelf' },
+      ];
+
+      const scene = document.querySelector('[data-scene]');
+      const statusEl = document.querySelector('[data-status]');
+      const messageEl = document.querySelector('[data-message]');
+      const tag = document.querySelector('[data-tag]');
+      const hintRing = document.querySelector('[data-hint]');
+      const attemptsEl = document.querySelector('[data-attempts]');
+      const bestEl = document.querySelector('[data-best]');
+      const lastEl = document.querySelector('[data-last]');
+      const startBtn = document.querySelector('[data-action="start"]');
+      const resetBtn = document.querySelector('[data-action="reset"]');
+
+      const bestKey = 'fd-find-deal-best';
+      const attemptKey = 'fd-find-deal-attempts';
+      let target = spots[0];
+      let running = false;
+      let startTime = 0;
+      let hintTimer = null;
+      let attempts = Number(localStorage.getItem(attemptKey) || 0);
+      let best = Number(localStorage.getItem(bestKey) || 0);
+
+      const setStatus = (text, sub) => {
+        statusEl.textContent = text;
+        messageEl.textContent = sub || '';
+      };
+
+      const updateStats = () => {
+        attemptsEl.textContent = attempts;
+        bestEl.textContent = best ? `${best}ms` : '—';
+      };
+
+      const positionElement = (el, area) => {
+        const [x1, y1, x2, y2] = area;
+        el.style.left = `${(x1 + x2) / 2}%`;
+        el.style.top = `${(y1 + y2) / 2}%`;
+        el.style.transform = 'translate(-50%, -50%)';
+      };
+
+      const chooseTarget = () => {
+        target = spots[Math.floor(Math.random() * spots.length)];
+        positionElement(tag, target.area);
+        positionElement(hintRing, target.area);
+      };
+
+      const startRound = () => {
+        if (running) return;
+        running = true;
+        startTime = performance.now();
+        tag.classList.remove('visible');
+        hintRing.classList.remove('show');
+        chooseTarget();
+        setStatus('Search underway.', 'Tap where you think the sale tag lives.');
+        clearTimeout(hintTimer);
+        hintTimer = setTimeout(() => {
+          hintRing.classList.add('show');
+          setStatus('Hint active.', 'Use the highlighted area to zero in.');
+        }, 10000);
+      };
+
+      const endRound = (success, timeMs) => {
+        running = false;
+        clearTimeout(hintTimer);
+        if (success) {
+          tag.classList.add('visible');
+          hintRing.classList.remove('show');
+          attempts += 1;
+          lastEl.textContent = `${timeMs}ms (${target.label})`;
+          if (!best || timeMs < best) {
+            best = timeMs;
+            localStorage.setItem(bestKey, String(best));
+          }
+          localStorage.setItem(attemptKey, String(attempts));
+          setStatus('Tag found!', `You spotted it in ${timeMs}ms.`);
+          updateStats();
+        } else {
+          setStatus('Missed.', 'Try again—watch for the hint ring.');
+        }
+      };
+
+      const clickScene = (event) => {
+        if (!running) {
+          setStatus('Tap Start search.', 'A new tag location appears each round.');
+          return;
+        }
+        const rect = scene.getBoundingClientRect();
+        const x = ((event.clientX - rect.left) / rect.width) * 100;
+        const y = ((event.clientY - rect.top) / rect.height) * 100;
+        const [x1, y1, x2, y2] = target.area;
+        const hit = x >= x1 && x <= x2 && y >= y1 && y <= y2;
+        if (hit) {
+          const elapsed = Math.max(1, Math.round(performance.now() - startTime));
+          endRound(true, elapsed);
+        } else {
+          endRound(false);
+        }
+      };
+
+      const reset = () => {
+        running = false;
+        clearTimeout(hintTimer);
+        tag.classList.remove('visible');
+        hintRing.classList.remove('show');
+        best = 0;
+        attempts = 0;
+        lastEl.textContent = '—';
+        localStorage.removeItem(bestKey);
+        localStorage.removeItem(attemptKey);
+        setStatus('Waiting to start.', 'Tap anywhere in the scene once the round begins.');
+        updateStats();
+      };
+
+      scene.addEventListener('click', clickScene);
+      startBtn.addEventListener('click', startRound);
+      resetBtn.addEventListener('click', reset);
+
+      updateStats();
     </script>
   </body>
 </html>

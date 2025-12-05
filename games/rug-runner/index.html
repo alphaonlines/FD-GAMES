@@ -3,22 +3,67 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rug Runner | FD Games</title>
+    <title>Rug Runner Prototype | FD Games</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="../common.css" />
+    <style>
+      .track {
+        position: relative;
+        height: 220px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: linear-gradient(180deg, rgba(102, 224, 255, 0.08), rgba(255, 255, 255, 0.02));
+        overflow: hidden;
+      }
+
+      .runner, .obstacle, .pickup {
+        position: absolute;
+        bottom: 22px;
+        width: 46px;
+        height: 46px;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+      }
+
+      .runner {
+        left: 32px;
+        background: linear-gradient(120deg, #66e0ff, #3b82f6);
+        color: #031126;
+        box-shadow: 0 10px 24px rgba(59, 130, 246, 0.35);
+      }
+
+      .obstacle {
+        background: rgba(252, 165, 165, 0.9);
+        color: #320000;
+      }
+
+      .pickup {
+        background: rgba(34, 197, 94, 0.9);
+        color: #0a1a0f;
+      }
+
+      .controls {
+        display: flex;
+        gap: 0.6rem;
+        flex-wrap: wrap;
+        margin-top: 0.75rem;
+      }
+    </style>
   </head>
   <body>
     <header>
       <div class="navbar">
         <div class="nav-left">
           <span class="brand">FD Games</span>
-          <span class="pill">Rug Runner</span>
+          <span class="pill">Prototype</span>
         </div>
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
           <a class="btn secondary" href="../../index.html">Back to hub</a>
-          <button class="btn outline" data-action="reset">Reset state</button>
+          <button class="btn outline" data-action="reset">Reset run</button>
         </div>
       </div>
     </header>
@@ -26,67 +71,162 @@
     <main class="container">
       <section class="hero">
         <div>
-          <p class="badge">Endless runner</p>
-          <h1>Roll out the rug, dodge obstacles, collect décor.</h1>
-          <p>
-            Build a swipe-based runner that spawns obstacles and pickups. Use combos for bonus pillows/throws and track
-            distance for score.
-          </p>
-          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem;">
-            <button class="btn" data-action="start">Start run</button>
+          <p class="badge">Endless sprint</p>
+          <h1>Rug Runner prototype</h1>
+          <p>Leap over crates, snag décor pickups, and stretch your run before the timer drains.</p>
+          <div class="hud" style="margin-top: 0.6rem;">
+            <div class="stat"><span>Distance</span><strong data-distance>0m</strong></div>
+            <div class="stat"><span>Energy</span><strong data-energy>100%</strong></div>
+            <div class="stat"><span>Best</span><strong data-best>0m</strong></div>
+          </div>
+          <div class="controls">
+            <button class="btn" data-action="start">Start sprint</button>
+            <button class="btn secondary" data-action="jump">Jump</button>
             <a class="btn secondary" href="../../start/rug-runner/README.md">View brief</a>
           </div>
-          <div class="status" style="margin-top: 1rem;">
-            <span class="status-indicator"></span>
-            <span data-status>Waiting for lane art.</span>
-          </div>
+          <p class="muted" style="margin-top: 0.5rem;" data-status>Tap jump or press space to clear obstacles.</p>
         </div>
         <div class="panel">
           <h3 class="section-title">Track</h3>
-          <p class="muted">Use this area for your runner track, swipe detection, and pickups.</p>
-          <div class="placeholder-area">Runner track placeholder.</div>
+          <div class="track" id="track"></div>
         </div>
-      </section>
-
-      <section style="margin-top: 1.5rem;" class="subgrid">
-        <div class="panel">
-          <h3 class="section-title">Build checklist</h3>
-          <div class="checklist" style="display: grid; gap: 0.75rem;">
-            <label><input type="checkbox" data-check="lanes" />Swipe controls + obstacle spawn.</label>
-            <label><input type="checkbox" data-check="pickups" />Pickups that fuel combo bar.</label>
-            <label><input type="checkbox" data-check="combos" />Combo scoring with decay timer.</label>
-          </div>
-        </div>
-        <div class="panel">
-          <h3 class="section-title">Design notes</h3>
-          <ul class="muted" style="line-height: 1.6; padding-left: 1.1rem;">
-            <li>Use décor pickups for on-brand visuals.</li>
-            <li>Gradual speed ramp with milestone events.</li>
-            <li>Keep controls simple for kiosk players.</li>
-          </ul>
-        </div>
-        <div class="panel">
-          <h3 class="section-title">Session notes</h3>
-          <p class="muted">Fast jot for findings or tweaks. Saved locally.</p>
-          <textarea data-note rows="6" style="width: 100%; border-radius: 12px; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: var(--text);"></textarea>
-        </div>
-      </section>
-
-      <section style="margin-top: 1.5rem;" class="panel">
-        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
-          <div>
-            <h3 class="section-title">Activity log</h3>
-            <p class="muted" style="margin: 0;">Capture your start/reset events here.</p>
-          </div>
-          <a class="btn secondary" href="../../README.md">Repo notes</a>
-        </div>
-        <ul class="log" data-log style="margin-top: 0.75rem;"></ul>
       </section>
     </main>
 
-    <script src="../common.js"></script>
     <script>
-      initGameSkeleton({ slug: 'rug-runner', title: 'Rug Runner', defaultStatus: 'Runner track pending.' });
+      const track = document.getElementById('track');
+      const statusEl = document.querySelector('[data-status]');
+      const distanceEl = document.querySelector('[data-distance]');
+      const energyEl = document.querySelector('[data-energy]');
+      const bestEl = document.querySelector('[data-best]');
+
+      let runnerY = 0;
+      let velocity = 0;
+      let gravity = -0.5;
+      let isRunning = false;
+      let distance = 0;
+      let energy = 100;
+      let best = Number(localStorage.getItem('fd-rug-best') || 0);
+      let objects = [];
+      let tickId = null;
+
+      function renderRunner() {
+        let runner = track.querySelector('.runner');
+        if (!runner) {
+          runner = document.createElement('div');
+          runner.className = 'runner';
+          runner.textContent = '🏃‍♂️';
+          track.appendChild(runner);
+        }
+        runner.style.bottom = `${22 + runnerY}px`;
+      }
+
+      function spawn() {
+        const type = Math.random() < 0.7 ? 'obstacle' : 'pickup';
+        const item = document.createElement('div');
+        item.className = type;
+        item.classList.add(type === 'obstacle' ? 'obstacle' : 'pickup');
+        item.style.left = '100%';
+        item.style.bottom = type === 'pickup' ? '82px' : '22px';
+        item.textContent = type === 'pickup' ? '+10' : 'Crate';
+        track.appendChild(item);
+        objects.push({ el: item, type });
+      }
+
+      function updateHUD() {
+        distanceEl.textContent = `${distance.toFixed(1)}m`;
+        energyEl.textContent = `${energy.toFixed(0)}%`;
+        bestEl.textContent = `${best.toFixed(1)}m`;
+      }
+
+      function jump() {
+        if (!isRunning) return;
+        if (runnerY > 0) return;
+        velocity = 9;
+        statusEl.textContent = 'Jump!';
+      }
+
+      function reset() {
+        objects.forEach((o) => o.el.remove());
+        objects = [];
+        runnerY = 0;
+        velocity = 0;
+        distance = 0;
+        energy = 100;
+        isRunning = false;
+        statusEl.textContent = 'Reset. Start sprint to run again.';
+        updateHUD();
+        renderRunner();
+        if (tickId) cancelAnimationFrame(tickId);
+        tickId = null;
+      }
+
+      function start() {
+        reset();
+        isRunning = true;
+        statusEl.textContent = 'Sprint live!';
+        loop();
+      }
+
+      function loop() {
+        if (!isRunning) return;
+        velocity += gravity;
+        runnerY = Math.max(0, runnerY + velocity);
+        if (runnerY === 0) velocity = 0;
+        distance += 0.3;
+        energy = Math.max(0, energy - 0.05);
+        if (Math.random() < 0.04) spawn();
+
+        objects.forEach((obj) => {
+          const left = (parseFloat(obj.el.style.left) || 100) - 1.8;
+          obj.el.style.left = `${left}%`;
+        });
+        objects = objects.filter((obj) => {
+          const left = parseFloat(obj.el.style.left);
+          if (left < -10) {
+            obj.el.remove();
+            return false;
+          }
+          const collides = left < 18 && left > 10 && runnerY < (obj.type === 'pickup' ? 40 : 10) + (obj.type === 'pickup' ? 40 : 0);
+          if (collides) {
+            if (obj.type === 'pickup') {
+              distance += 3;
+              energy = Math.min(100, energy + 8);
+              statusEl.textContent = 'Decor snagged!';
+            } else {
+              energy -= 15;
+              statusEl.textContent = 'Ouch! Crate collision.';
+            }
+            obj.el.remove();
+            return false;
+          }
+          return true;
+        });
+
+        if (energy <= 0) {
+          isRunning = false;
+          best = Math.max(best, distance);
+          localStorage.setItem('fd-rug-best', best);
+          statusEl.textContent = 'Energy out. Reset to sprint again.';
+        }
+
+        renderRunner();
+        updateHUD();
+        tickId = requestAnimationFrame(loop);
+      }
+
+      document.querySelector('[data-action="start"]').addEventListener('click', start);
+      document.querySelector('[data-action="jump"]').addEventListener('click', jump);
+      document.querySelector('[data-action="reset"]').addEventListener('click', reset);
+      document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space') {
+          e.preventDefault();
+          jump();
+        }
+      });
+
+      renderRunner();
+      updateHUD();
     </script>
   </body>
 </html>

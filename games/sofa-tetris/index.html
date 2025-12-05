@@ -3,22 +3,56 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sofa Tetris | FD Games</title>
+    <title>Sofa Tetris Prototype | FD Games</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="../common.css" />
+    <style>
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(10, 1fr);
+        gap: 3px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 6px;
+      }
+
+      .cell {
+        width: 26px;
+        height: 26px;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .cell.filled {
+        background: linear-gradient(135deg, #66e0ff, #3b82f6);
+        box-shadow: 0 8px 18px rgba(59, 130, 246, 0.35);
+      }
+
+      .cell.active {
+        background: rgba(249, 168, 38, 0.8);
+      }
+
+      .controls {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-top: 0.75rem;
+      }
+    </style>
   </head>
   <body>
     <header>
       <div class="navbar">
         <div class="nav-left">
           <span class="brand">FD Games</span>
-          <span class="pill">Sofa Tetris</span>
+          <span class="pill">Prototype</span>
         </div>
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
           <a class="btn secondary" href="../../index.html">Back to hub</a>
-          <button class="btn outline" data-action="reset">Reset state</button>
+          <button class="btn outline" data-action="reset">Reset</button>
         </div>
       </div>
     </header>
@@ -26,67 +60,219 @@
     <main class="container">
       <section class="hero">
         <div>
-          <p class="badge">Block fitting</p>
-          <h1>Clear lines with furniture silhouettes.</h1>
-          <p>
-            Use this scaffold for your board, fall speed, and rotation controls. Swap default blocks for FD silhouettes and
-            tune speed ramps.
-          </p>
-          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem;">
-            <button class="btn" data-action="start">Start stack</button>
+          <p class="badge">Stacking puzzle</p>
+          <h1>Sofa Tetris prototype</h1>
+          <p>Drop furniture silhouettes to clear full lines. Arrow keys or buttons move; space rotates.</p>
+          <div class="hud" style="margin-top: 0.6rem;">
+            <div class="stat"><span>Score</span><strong data-score>0</strong></div>
+            <div class="stat"><span>Lines</span><strong data-lines>0</strong></div>
+            <div class="stat"><span>Best</span><strong data-best>0</strong></div>
+          </div>
+          <div class="controls">
+            <button class="btn" data-action="start">Start</button>
+            <button class="btn secondary" data-action="left">←</button>
+            <button class="btn secondary" data-action="right">→</button>
+            <button class="btn secondary" data-action="rotate">Rotate</button>
+            <button class="btn secondary" data-action="drop">Soft drop</button>
             <a class="btn secondary" href="../../start/sofa-tetris/README.md">View brief</a>
           </div>
-          <div class="status" style="margin-top: 1rem;">
-            <span class="status-indicator"></span>
-            <span data-status>Awaiting board setup.</span>
-          </div>
+          <p class="muted" style="margin-top: 0.5rem;" data-status>Press Start to spawn the first sofa shape.</p>
         </div>
         <div class="panel">
-          <h3 class="section-title">Board</h3>
-          <p class="muted">Use this block for your grid, drop logic, and clear animations.</p>
-          <div class="placeholder-area">Tetris board placeholder.</div>
+          <h3 class="section-title">Well</h3>
+          <div id="well" class="grid"></div>
         </div>
       </section>
 
-      <section style="margin-top: 1.5rem;" class="subgrid">
-        <div class="panel">
-          <h3 class="section-title">Build checklist</h3>
-          <div class="checklist" style="display: grid; gap: 0.75rem;">
-            <label><input type="checkbox" data-check="board" />Board/grid rendering + collision.</label>
-            <label><input type="checkbox" data-check="speed" />Speed ramp + level tracking.</label>
-            <label><input type="checkbox" data-check="silhouettes" />Replace tetrominos with FD silhouettes.</label>
-          </div>
-        </div>
-        <div class="panel">
-          <h3 class="section-title">Design notes</h3>
-          <ul class="muted" style="line-height: 1.6; padding-left: 1.1rem;">
-            <li>Offer rotate buttons for kiosks + keyboard fallback.</li>
-            <li>Score combos for clearing multiple lines.</li>
-            <li>Daily leaderboard resets for fresh runs.</li>
-          </ul>
-        </div>
-        <div class="panel">
-          <h3 class="section-title">Session notes</h3>
-          <p class="muted">Fast jot for findings or tweaks. Saved locally.</p>
-          <textarea data-note rows="6" style="width: 100%; border-radius: 12px; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: var(--text);"></textarea>
-        </div>
-      </section>
-
-      <section style="margin-top: 1.5rem;" class="panel">
-        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
-          <div>
-            <h3 class="section-title">Activity log</h3>
-            <p class="muted" style="margin: 0;">Track when you start/reset during testing.</p>
-          </div>
-          <a class="btn secondary" href="../../README.md">Repo notes</a>
-        </div>
-        <ul class="log" data-log style="margin-top: 0.75rem;"></ul>
+      <section style="margin-top: 1.2rem;" class="panel">
+        <h3 class="section-title">Notes</h3>
+        <textarea data-note rows="4" style="width: 100%; border-radius: 12px; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: var(--text);"></textarea>
       </section>
     </main>
 
-    <script src="../common.js"></script>
     <script>
-      initGameSkeleton({ slug: 'sofa-tetris', title: 'Sofa Tetris', defaultStatus: 'Board ready soon.' });
+      const well = document.getElementById('well');
+      const statusEl = document.querySelector('[data-status]');
+      const scoreEl = document.querySelector('[data-score]');
+      const linesEl = document.querySelector('[data-lines]');
+      const bestEl = document.querySelector('[data-best]');
+      const note = document.querySelector('[data-note]');
+
+      const width = 10;
+      const height = 16;
+      const cells = [];
+      const shapes = [
+        [[0, 0], [1, 0], [0, 1], [1, 1]], // square
+        [[0, 0], [0, 1], [0, 2], [1, 2]], // L
+        [[1, 0], [1, 1], [1, 2], [0, 2]], // J
+        [[0, 0], [1, 0], [1, 1], [2, 1]], // S
+        [[1, 0], [2, 0], [0, 1], [1, 1]], // Z
+        [[0, 0], [1, 0], [2, 0], [3, 0]], // line
+        [[0, 0], [1, 0], [2, 0], [1, 1]], // T
+      ];
+
+      let grid = [];
+      let active = null;
+      let timer = null;
+      let score = 0;
+      let lines = 0;
+      let best = Number(localStorage.getItem('fd-sofa-best') || 0);
+
+      function buildGrid() {
+        well.innerHTML = '';
+        grid = Array.from({ length: height }, () => Array(width).fill(0));
+        for (let i = 0; i < width * height; i += 1) {
+          const cell = document.createElement('div');
+          cell.className = 'cell';
+          well.appendChild(cell);
+          cells.push(cell);
+        }
+      }
+
+      function draw() {
+        grid.flat().forEach((_, idx) => {
+          cells[idx].classList.remove('filled', 'active');
+        });
+        grid.forEach((row, y) => {
+          row.forEach((val, x) => {
+            if (val) cells[y * width + x].classList.add('filled');
+          });
+        });
+        if (active) {
+          active.blocks.forEach(([x, y]) => {
+            if (y >= 0) cells[y * width + x].classList.add('active');
+          });
+        }
+      }
+
+      function spawn() {
+        const shape = shapes[Math.floor(Math.random() * shapes.length)];
+        active = {
+          x: 4,
+          y: -2,
+          blocks: shape.map(([x, y]) => [x, y]),
+        };
+        if (collides(active.x, active.y, active.blocks)) {
+          gameOver();
+        }
+      }
+
+      function collides(x, y, blocks) {
+        return blocks.some(([bx, by]) => {
+          const nx = x + bx;
+          const ny = y + by;
+          return nx < 0 || nx >= width || ny >= height || (ny >= 0 && grid[ny][nx]);
+        });
+      }
+
+      function rotate() {
+        if (!active) return;
+        const rotated = active.blocks.map(([x, y]) => [y, -x]);
+        if (!collides(active.x, active.y, rotated)) {
+          active.blocks = rotated;
+          draw();
+        }
+      }
+
+      function move(dx, dy) {
+        if (!active) return;
+        if (!collides(active.x + dx, active.y + dy, active.blocks)) {
+          active.x += dx;
+          active.y += dy;
+        } else if (dy === 1) {
+          lockPiece();
+        }
+        draw();
+      }
+
+      function lockPiece() {
+        active.blocks.forEach(([bx, by]) => {
+          const x = active.x + bx;
+          const y = active.y + by;
+          if (y >= 0) grid[y][x] = 1;
+        });
+        clearLines();
+        spawn();
+      }
+
+      function clearLines() {
+        let cleared = 0;
+        for (let y = grid.length - 1; y >= 0; y -= 1) {
+          if (grid[y].every((cell) => cell)) {
+            grid.splice(y, 1);
+            grid.unshift(Array(width).fill(0));
+            cleared += 1;
+            y += 1;
+          }
+        }
+        if (cleared) {
+          lines += cleared;
+          score += cleared * 100;
+          statusEl.textContent = `Cleared ${cleared} line${cleared > 1 ? 's' : ''}!`;
+          updateHUD();
+        }
+      }
+
+      function step() {
+        move(0, 1);
+        timer = setTimeout(step, 700);
+      }
+
+      function updateHUD() {
+        scoreEl.textContent = score;
+        linesEl.textContent = lines;
+        bestEl.textContent = best;
+      }
+
+      function start() {
+        reset();
+        statusEl.textContent = 'Run started. Stack pieces to clear lines.';
+        spawn();
+        draw();
+        step();
+      }
+
+      function gameOver() {
+        clearTimeout(timer);
+        timer = null;
+        best = Math.max(best, score);
+        localStorage.setItem('fd-sofa-best', best);
+        statusEl.textContent = 'Well filled. Press Start to try again.';
+        updateHUD();
+      }
+
+      function reset() {
+        clearTimeout(timer);
+        timer = null;
+        grid = Array.from({ length: height }, () => Array(width).fill(0));
+        active = null;
+        score = 0;
+        lines = 0;
+        draw();
+        updateHUD();
+        statusEl.textContent = 'Reset complete.';
+      }
+
+      document.querySelector('[data-action="start"]').addEventListener('click', start);
+      document.querySelector('[data-action="left"]').addEventListener('click', () => move(-1, 0));
+      document.querySelector('[data-action="right"]').addEventListener('click', () => move(1, 0));
+      document.querySelector('[data-action="rotate"]').addEventListener('click', rotate);
+      document.querySelector('[data-action="drop"]').addEventListener('click', () => move(0, 1));
+      document.querySelector('[data-action="reset"]').addEventListener('click', reset);
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') move(-1, 0);
+        if (e.key === 'ArrowRight') move(1, 0);
+        if (e.key === 'ArrowDown') move(0, 1);
+        if (e.code === 'Space') rotate();
+      });
+
+      note.value = localStorage.getItem('fd-sofa-note') || '';
+      note.addEventListener('input', () => localStorage.setItem('fd-sofa-note', note.value));
+
+      buildGrid();
+      updateHUD();
+      draw();
     </script>
   </body>
 </html>

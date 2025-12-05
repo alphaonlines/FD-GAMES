@@ -3,22 +3,55 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Price Is Right: Furniture Edition | FD Games</title>
+    <title>Price Is Right Prototype | FD Games</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="../common.css" />
+    <style>
+      .board {
+        display: grid;
+        gap: 1rem;
+      }
+
+      .product {
+        border-radius: 14px;
+        padding: 1rem;
+        background: linear-gradient(140deg, rgba(249, 168, 38, 0.15), rgba(255, 255, 255, 0.05));
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        display: grid;
+        gap: 0.35rem;
+      }
+
+      .guess-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 0.75rem;
+        align-items: center;
+      }
+
+      .bubble {
+        padding: 0.4rem 0.75rem;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 999px;
+        color: var(--muted);
+        display: inline-flex;
+        gap: 0.35rem;
+        align-items: center;
+      }
+    </style>
   </head>
   <body>
     <header>
       <div class="navbar">
         <div class="nav-left">
           <span class="brand">FD Games</span>
-          <span class="pill">Price Is Right</span>
+          <span class="pill">Prototype</span>
         </div>
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
           <a class="btn secondary" href="../../index.html">Back to hub</a>
-          <button class="btn outline" data-action="reset">Reset state</button>
+          <button class="btn outline" data-action="reset">Reset streak</button>
         </div>
       </div>
     </header>
@@ -26,67 +59,128 @@
     <main class="container">
       <section class="hero">
         <div>
-          <p class="badge">Pricing challenge</p>
-          <h1>Guess above/below or pick the closest price.</h1>
+          <p class="badge">Higher or lower</p>
+          <h1>Furniture pricing prototype</h1>
           <p>
-            Add huge buttons, streak bonuses, and item cards. Swap between price ranges or true MSRP; this skeleton leaves
-            hooks for the logic and keeps your notes on page.
+            Decide if the actual price is higher or lower than the displayed tag. Keep your streak alive and earn bonus point
+            multipliers.
           </p>
-          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem;">
-            <button class="btn" data-action="start">Start round</button>
+          <div style="display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.6rem;">
+            <button class="btn" data-action="higher">Higher</button>
+            <button class="btn secondary" data-action="lower">Lower</button>
             <a class="btn secondary" href="../../start/price-is-right-furniture-edition/README.md">View brief</a>
           </div>
-          <div class="status" style="margin-top: 1rem;">
-            <span class="status-indicator"></span>
-            <span data-status>Waiting for pricing deck.</span>
+          <div class="hud" style="margin-top: 0.75rem;">
+            <div class="stat"><span>Streak</span><strong data-streak>0</strong></div>
+            <div class="stat"><span>Score</span><strong data-score>0</strong></div>
+            <div class="stat"><span>Best streak</span><strong data-best>0</strong></div>
           </div>
+          <p class="muted" style="margin-top: 0.6rem;" data-status>Tap Higher or Lower to lock your guess.</p>
         </div>
-        <div class="panel">
-          <h3 class="section-title">Prompt + buttons</h3>
-          <p class="muted">Use this area for giant CTA buttons and item card art.</p>
-          <div class="placeholder-area">Price prompt placeholder.</div>
+        <div class="panel board">
+          <div class="product" id="product"></div>
+          <div class="guess-row">
+            <div>
+              <p class="muted" style="margin: 0;">Shown price</p>
+              <h2 style="margin: 0;" data-shown>$0</h2>
+            </div>
+            <div>
+              <p class="muted" style="margin: 0;">Actual price</p>
+              <h2 style="margin: 0;" data-actual>Hidden</h2>
+            </div>
+            <div class="bubble" data-diff>Awaiting guess</div>
+          </div>
         </div>
       </section>
 
-      <section style="margin-top: 1.5rem;" class="subgrid">
-        <div class="panel">
-          <h3 class="section-title">Build checklist</h3>
-          <div class="checklist" style="display: grid; gap: 0.75rem;">
-            <label><input type="checkbox" data-check="buttons" />Above/below or multi-choice button set.</label>
-            <label><input type="checkbox" data-check="streak" />Streak bonus + timer bonus scoring.</label>
-            <label><input type="checkbox" data-check="deck" />Item deck with MSRP or price buckets.</label>
-          </div>
-        </div>
-        <div class="panel">
-          <h3 class="section-title">Design notes</h3>
-          <ul class="muted" style="line-height: 1.6; padding-left: 1.1rem;">
-            <li>Keep CTAs thumb-sized for kiosk play.</li>
-            <li>Reveal correct answer with quick animation.</li>
-            <li>Optional leaderboard by store/day.</li>
-          </ul>
-        </div>
-        <div class="panel">
-          <h3 class="section-title">Session notes</h3>
-          <p class="muted">Fast jot for findings or tweaks. Saved locally.</p>
-          <textarea data-note rows="6" style="width: 100%; border-radius: 12px; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: var(--text);"></textarea>
-        </div>
-      </section>
-
-      <section style="margin-top: 1.5rem;" class="panel">
-        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
-          <div>
-            <h3 class="section-title">Activity log</h3>
-            <p class="muted" style="margin: 0;">Use for debug taps or price submissions.</p>
-          </div>
-          <a class="btn secondary" href="../../README.md">Repo notes</a>
-        </div>
-        <ul class="log" data-log style="margin-top: 0.75rem;"></ul>
+      <section style="margin-top: 1.25rem;" class="panel">
+        <h3 class="section-title">Notes</h3>
+        <textarea data-note rows="4" style="width: 100%; border-radius: 12px; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: var(--text);"></textarea>
       </section>
     </main>
 
-    <script src="../common.js"></script>
     <script>
-      initGameSkeleton({ slug: 'price-is-right', title: 'Price Is Right', defaultStatus: 'Price deck pending.' });
+      const items = [
+        { name: 'Velvet sofa, 82"', price: 1299, note: 'Performance fabric + kiln-dried frame.' },
+        { name: 'Queen storage bed', price: 1099, note: 'Lift-up platform with hidden bins.' },
+        { name: 'Dining set, 6pc', price: 899, note: 'Expandable table with upholstered chairs.' },
+        { name: 'Media console, walnut', price: 749, note: 'Cord management + soft-close doors.' },
+        { name: 'Outdoor lounge set', price: 1399, note: 'Weather-ready cushions, 5pc.' },
+        { name: 'Modular sectional', price: 1899, note: 'Reversible chaise + ottoman.' },
+        { name: 'Office chair', price: 399, note: 'Ergonomic with adjustable lumbar.' },
+        { name: 'Statement floor lamp', price: 229, note: 'Dimmable LED with marble base.' },
+      ];
+
+      const productEl = document.getElementById('product');
+      const shownEl = document.querySelector('[data-shown]');
+      const actualEl = document.querySelector('[data-actual]');
+      const diffEl = document.querySelector('[data-diff]');
+      const statusEl = document.querySelector('[data-status]');
+      const streakEl = document.querySelector('[data-streak]');
+      const scoreEl = document.querySelector('[data-score]');
+      const bestEl = document.querySelector('[data-best]');
+      const note = document.querySelector('[data-note]');
+
+      let current = null;
+      let streak = 0;
+      let score = 0;
+      let best = Number(localStorage.getItem('fd-price-best') || 0);
+
+      function drawItem() {
+        current = items[Math.floor(Math.random() * items.length)];
+        const variance = Math.floor(Math.random() * 400) - 200; // ±$200
+        current.displayPrice = Math.max(50, current.price + variance);
+        productEl.innerHTML = `<p class="muted" style="margin: 0;">${current.note}</p><h2 style="margin: 0;">${current.name}</h2>`;
+        shownEl.textContent = `$${current.displayPrice.toLocaleString()}`;
+        actualEl.textContent = 'Hidden';
+        diffEl.textContent = 'Awaiting guess';
+        diffEl.style.color = 'var(--muted)';
+      }
+
+      function updateHUD() {
+        streakEl.textContent = streak;
+        scoreEl.textContent = score;
+        bestEl.textContent = best;
+      }
+
+      function resolveGuess(direction) {
+        if (!current) return;
+        const actual = current.price;
+        const higher = actual > current.displayPrice;
+        const correct = (direction === 'higher' && higher) || (direction === 'lower' && !higher);
+        actualEl.textContent = `$${actual.toLocaleString()}`;
+        const delta = Math.abs(actual - current.displayPrice);
+        diffEl.textContent = `${higher ? 'Actual is higher' : 'Actual is lower'} (${delta === 0 ? 'exact' : `$${delta}`})`;
+        diffEl.style.color = correct ? '#c4f0d2' : '#fca5a5';
+        if (correct) {
+          streak += 1;
+          score += 50 + Math.max(0, 5 - Math.floor(delta / 50));
+          statusEl.textContent = 'Correct! Loading next item.';
+          best = Math.max(best, streak);
+          localStorage.setItem('fd-price-best', best);
+        } else {
+          statusEl.textContent = 'Incorrect, streak reset.';
+          streak = 0;
+        }
+        updateHUD();
+        setTimeout(drawItem, 850);
+      }
+
+      document.querySelector('[data-action="higher"]').addEventListener('click', () => resolveGuess('higher'));
+      document.querySelector('[data-action="lower"]').addEventListener('click', () => resolveGuess('lower'));
+      document.querySelector('[data-action="reset"]').addEventListener('click', () => {
+        streak = 0;
+        score = 0;
+        statusEl.textContent = 'Streak cleared. Try again.';
+        updateHUD();
+        drawItem();
+      });
+
+      note.value = localStorage.getItem('fd-price-note') || '';
+      note.addEventListener('input', () => localStorage.setItem('fd-price-note', note.value));
+
+      updateHUD();
+      drawItem();
     </script>
   </body>
 </html>
