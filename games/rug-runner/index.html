@@ -100,6 +100,7 @@
       const energyEl = document.querySelector('[data-energy]');
       const bestEl = document.querySelector('[data-best]');
 
+      let runnerEl = null;
       let runnerY = 0;
       let velocity = 0;
       let gravity = -0.5;
@@ -111,14 +112,13 @@
       let tickId = null;
 
       function renderRunner() {
-        let runner = track.querySelector('.runner');
-        if (!runner) {
-          runner = document.createElement('div');
-          runner.className = 'runner';
-          runner.textContent = '🏃‍♂️';
-          track.appendChild(runner);
+        if (!runnerEl) {
+          runnerEl = document.createElement('div');
+          runnerEl.className = 'runner';
+          runnerEl.textContent = '🏃‍♂️';
+          track.appendChild(runnerEl);
         }
-        runner.style.bottom = `${22 + runnerY}px`;
+        runnerEl.style.bottom = `${22 + runnerY}px`;
       }
 
       function spawn() {
@@ -173,9 +173,12 @@
         velocity += gravity;
         runnerY = Math.max(0, runnerY + velocity);
         if (runnerY === 0) velocity = 0;
+        renderRunner();
         distance += 0.3;
         energy = Math.max(0, energy - 0.05);
         if (Math.random() < 0.04) spawn();
+
+        const runnerBox = runnerEl.getBoundingClientRect();
 
         objects.forEach((obj) => {
           const left = (parseFloat(obj.el.style.left) || 100) - 1.8;
@@ -187,7 +190,8 @@
             obj.el.remove();
             return false;
           }
-          const collides = left < 18 && left > 10 && runnerY < (obj.type === 'pickup' ? 40 : 10) + (obj.type === 'pickup' ? 40 : 0);
+          const objBox = obj.el.getBoundingClientRect();
+          const collides = runnerBox.left < objBox.right && runnerBox.right > objBox.left && runnerBox.top < objBox.bottom && runnerBox.bottom > objBox.top;
           if (collides) {
             if (obj.type === 'pickup') {
               distance += 3;
@@ -210,7 +214,6 @@
           statusEl.textContent = 'Energy out. Reset to sprint again.';
         }
 
-        renderRunner();
         updateHUD();
         tickId = requestAnimationFrame(loop);
       }
