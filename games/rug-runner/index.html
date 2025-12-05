@@ -22,7 +22,8 @@
       .runner,
       .obstacle,
       .pickup,
-      .tip {
+      .tip,
+      .warning {
         position: absolute;
         bottom: 22px;
         width: 46px;
@@ -55,6 +56,10 @@
         animation: shake 0.35s;
       }
 
+      .track.shake {
+        animation: shakeTrack 0.45s;
+      }
+
       @keyframes shake {
         10%,
         90% {
@@ -75,6 +80,25 @@
         }
       }
 
+      @keyframes shakeTrack {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        20% {
+          transform: translateX(-4px);
+        }
+        40% {
+          transform: translateX(4px);
+        }
+        60% {
+          transform: translateX(-3px);
+        }
+        80% {
+          transform: translateX(3px);
+        }
+      }
+
       .obstacle {
         background: rgba(252, 165, 165, 0.9);
         color: #320000;
@@ -83,6 +107,31 @@
       .pickup {
         background: rgba(34, 197, 94, 0.9);
         color: #0a1a0f;
+      }
+
+      .warning {
+        background: rgba(250, 204, 21, 0.22);
+        color: #facc15;
+        width: auto;
+        padding: 0.2rem 0.5rem;
+        border-radius: 999px;
+        border: 1px dashed rgba(250, 204, 21, 0.5);
+        right: 12px;
+        top: 12px;
+        bottom: auto;
+        animation: blink 0.7s ease-in-out infinite;
+      }
+
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 0.8;
+          transform: translateX(0);
+        }
+        50% {
+          opacity: 0.3;
+          transform: translateX(-3px);
+        }
       }
 
       .tip {
@@ -120,11 +169,35 @@
         height: 100%;
         background: linear-gradient(90deg, #22c55e, #3b82f6);
         width: 100%;
+        transition: width 0.18s ease, filter 0.2s ease;
+      }
+
+      .hud-progress span.low {
+        animation: pulse 0.9s ease-in-out infinite;
+        filter: drop-shadow(0 0 6px rgba(248, 113, 113, 0.7));
+      }
+
+      @keyframes pulse {
+        0% {
+          opacity: 0.7;
+        }
+        50% {
+          opacity: 0.3;
+        }
+        100% {
+          opacity: 1;
+        }
       }
 
       .pill.small {
         padding: 0.2rem 0.5rem;
         font-size: 12px;
+      }
+
+      .pill.warn {
+        background: rgba(248, 113, 113, 0.14);
+        color: #fecdd3;
+        border: 1px solid rgba(248, 113, 113, 0.45);
       }
 
       .hotkey-hint {
@@ -166,6 +239,15 @@
         color: #4ade80;
         border: 1px solid rgba(74, 222, 128, 0.24);
       }
+
+      .missions li {
+        list-style: disc;
+        color: #dbeafe;
+      }
+
+      .missions small {
+        color: rgba(255, 255, 255, 0.7);
+      }
     </style>
   </head>
   <body>
@@ -204,6 +286,13 @@
           <h3 class="section-title">Track</h3>
           <div class="track" id="track">
             <div class="tip" data-tip>Stay low to slide under crates. Arrow/W = jump, ArrowDown/S = slide.</div>
+            <div class="warning" data-warning style="display: none;">Incoming!</div>
+            <div style="position: absolute; top: 12px; left: 12px; display: flex; gap: 0.4rem; flex-wrap: wrap;">
+              <span class="pill small" data-pace>Pace 1</span>
+              <span class="pill small" data-speed>Speed x1.00</span>
+              <span class="pill small combo-badge" data-combo>Combo 0x</span>
+              <span class="pill small" data-buff style="display: none;">Buff ready</span>
+            </div>
           </div>
           <div class="controls" style="margin-top: 0.75rem;">
             <div class="track-buttons">
@@ -212,6 +301,15 @@
             </div>
             <span class="hotkey-hint">Tip: double-jump once mid-air for an extra lift.</span>
           </div>
+        </div>
+      </section>
+      <section class="panel" style="margin-top: 1rem;">
+        <div class="card-body">
+          <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+            <p class="badge" style="margin: 0;">Run goals</p>
+            <small class="muted">Daily-style objectives to encourage varied runs.</small>
+          </div>
+          <ul id="mission-list" class="missions" style="margin: 0.5rem 0 0 1rem; display: grid; gap: 0.3rem;"></ul>
         </div>
       </section>
     </main>
@@ -248,6 +346,7 @@
           <div class="controls" style="margin-top: 0.75rem;">
             <button class="btn" data-action="restart">Restart</button>
             <button class="btn secondary" data-action="share">Share score</button>
+            <button class="btn outline" data-action="replay-tutorial">Replay tutorial</button>
           </div>
         </div>
       </div>
@@ -266,6 +365,12 @@
       const summaryPickups = document.querySelector('[data-summary-pickups]');
       const summaryBest = document.querySelector('[data-summary-best]');
       const tipEl = document.querySelector('[data-tip]');
+      const warningEl = document.querySelector('[data-warning]');
+      const paceEl = document.querySelector('[data-pace]');
+      const speedEl = document.querySelector('[data-speed]');
+      const comboEl = document.querySelector('[data-combo]');
+      const buffEl = document.querySelector('[data-buff]');
+      const missionList = document.getElementById('mission-list');
       const energyBar = document.createElement('div');
       energyBar.className = 'hud-progress';
       energyBar.innerHTML = '<span style="width: 100%"></span>';
@@ -285,20 +390,85 @@
       let startTime = 0;
       let speed = 1;
       let jumpsAvailable = 2;
+      let lastGroundedTime = 0;
+      const coyoteWindow = 140;
+      const keysDown = new Set();
       let sliding = false;
       let slideCooldown = false;
+      let slideBoostTimer = 0;
       let pickups = 0;
       let combo = 0;
       let bestCombo = 0;
+      let hitCount = 0;
+      let nearMisses = 0;
+      let graceTimer = 0;
+      let nextBuffAt = 60;
+      let activeBuff = null;
+      let buffTimer = 0;
+      let lastHitTime = 0;
+      let tierTimes = {};
+      let obstacleStreak = 0;
+
+      function renderMissions() {
+        const saved = JSON.parse(localStorage.getItem('fd-rug-missions') || '{}');
+        missionList.innerHTML = '';
+        missions.forEach((mission) => {
+          const completed = mission.check() || saved[mission.id];
+          if (completed) {
+            saved[mission.id] = true;
+          }
+          const li = document.createElement('li');
+          li.textContent = mission.text;
+          if (completed) {
+            li.innerHTML = `✅ ${mission.text} <small>(done)</small>`;
+          }
+          missionList.appendChild(li);
+        });
+        localStorage.setItem('fd-rug-missions', JSON.stringify(saved));
+      }
 
       const patterns = [
-        ['obstacle'],
-        ['pickup'],
-        ['pickup', 'obstacle'],
-        ['obstacle', 'pickup'],
-        ['pickup', 'pickup'],
-        ['obstacle', 'obstacle'],
-        ['pickup', 'obstacle', 'pickup'],
+        [{ type: 'obstacle' }],
+        [{ type: 'pickup' }],
+        [
+          { type: 'pickup', height: 88 },
+          { type: 'obstacle', height: 22 },
+        ],
+        [
+          { type: 'obstacle', height: 22 },
+          { type: 'pickup', height: 88 },
+        ],
+        [
+          { type: 'pickup', height: 88 },
+          { type: 'pickup', height: 120 },
+        ],
+        [
+          { type: 'obstacle', height: 22 },
+          { type: 'obstacle', height: 40 },
+        ],
+        [
+          { type: 'pickup', height: 88 },
+          { type: 'obstacle', height: 32, moving: true },
+          { type: 'pickup', height: 70 },
+        ],
+      ];
+
+      const missions = [
+        {
+          id: 'mission-distance',
+          text: 'Survive past Pace 3 (60s).',
+          check: () => difficultyTier >= 3,
+        },
+        {
+          id: 'mission-combo',
+          text: 'Hit a 4x pickup chain.',
+          check: () => bestCombo >= 4,
+        },
+        {
+          id: 'mission-buffs',
+          text: 'Trigger a buff pickup.',
+          check: () => Boolean(localStorage.getItem('fd-rug-buff-hit')),
+        },
       ];
 
       function renderRunner() {
@@ -311,38 +481,63 @@
         runnerEl.style.bottom = `${22 + runnerY}px`;
       }
 
-      function spawnPattern(pattern = ['obstacle']) {
-        pattern.forEach((type, idx) => {
+      function spawnPattern(pattern = [{ type: 'obstacle' }]) {
+        warningEl.style.display = 'block';
+        warningEl.textContent = 'Incoming pattern…';
+        setTimeout(() => {
+          warningEl.style.display = 'none';
+        }, 900);
+        pattern.forEach((config, idx) => {
+          const { type, height = type === 'pickup' ? 88 : 22, moving = false } = config;
           const item = document.createElement('div');
           item.className = type;
           item.classList.add(type === 'obstacle' ? 'obstacle' : 'pickup');
           item.style.left = `${100 + idx * 14}%`;
-          item.style.bottom = type === 'pickup' ? '88px' : '22px';
-          item.textContent = type === 'pickup' ? '+10' : 'Crate';
+          item.style.bottom = `${height}px`;
+          item.textContent = type === 'pickup' ? '+10' : moving ? 'Mover' : 'Crate';
+          if (moving) {
+            item.dataset.moving = '1';
+          }
           track.appendChild(item);
-          objects.push({ el: item, type });
+          objects.push({ el: item, type, warned: false });
         });
       }
 
       function updateHUD() {
         distanceEl.textContent = `${distance.toFixed(1)}m`;
         energyEl.textContent = `${energy.toFixed(0)}%`;
-        const clamped = Math.max(0, Math.min(100, energy));
-        energyBar.querySelector('span').style.width = `${clamped}%`;
+        const clamped = Math.max(0, Math.min(120, energy));
+        const span = energyBar.querySelector('span');
+        span.style.width = `${clamped}%`;
+        span.classList.toggle('low', energy < 25);
         bestEl.textContent = `${best.toFixed(1)}m`;
+        paceEl.textContent = `Pace ${difficultyTier}`;
+        speedEl.textContent = `Speed x${speed.toFixed(2)}`;
+        comboEl.textContent = `Combo ${combo}x`;
+        comboEl.style.opacity = combo > 0 ? 1 : 0.5;
+        buffEl.style.display = activeBuff ? 'inline-flex' : 'none';
+        buffEl.textContent = activeBuff ? `${activeBuff.toUpperCase()} • ${Math.ceil(buffTimer / 60)}s` : '';
       }
 
       function jump() {
         if (!isRunning) return;
-        if (jumpsAvailable <= 0) return;
-        velocity = jumpsAvailable === 2 ? 9.5 : 8;
+        const now = performance.now();
+        const canCoyote = jumpsAvailable === 2 && now - lastGroundedTime < coyoteWindow;
+        if (jumpsAvailable <= 0 && !canCoyote) return;
+        if (sliding) {
+          sliding = false;
+          runnerEl?.classList.remove('slide');
+        }
+        velocity = jumpsAvailable === 2 || canCoyote ? 9.5 : 8.4;
         runnerEl?.classList.add('jump');
         setTimeout(() => runnerEl?.classList.remove('jump'), 200);
-        statusEl.textContent = jumpsAvailable === 2 ? 'Jump!' : 'Double jump!';
-        if (jumpsAvailable === 1) {
+        statusEl.textContent = jumpsAvailable === 2 || canCoyote ? 'Jump!' : 'Double jump!';
+        if (jumpsAvailable === 1 && !canCoyote) {
           energy = Math.max(0, energy - 2);
         }
-        jumpsAvailable -= 1;
+        if (!canCoyote) {
+          jumpsAvailable -= 1;
+        }
       }
 
       function slide() {
@@ -351,6 +546,7 @@
         slideCooldown = true;
         runnerEl?.classList.add('slide');
         statusEl.textContent = 'Slide!';
+        slideBoostTimer = 120;
         setTimeout(() => {
           sliding = false;
           runnerEl?.classList.remove('slide');
@@ -371,12 +567,24 @@
         difficultyTier = 1;
         speed = 1;
         jumpsAvailable = 2;
+        lastGroundedTime = performance.now();
         sliding = false;
         slideCooldown = false;
+        slideBoostTimer = 0;
         pickups = 0;
         combo = 0;
         bestCombo = Number(localStorage.getItem('fd-rug-combo') || 0);
+        hitCount = 0;
+        nearMisses = 0;
+        graceTimer = 0;
+        nextBuffAt = 60;
+        activeBuff = null;
+        buffTimer = 0;
+        lastHitTime = 0;
+        tierTimes = {};
+        obstacleStreak = 0;
         statusEl.textContent = 'Reset. Start sprint to run again.';
+        warningEl.style.display = 'none';
         updateHUD();
         renderRunner();
         if (tickId) cancelAnimationFrame(tickId);
@@ -390,29 +598,64 @@
         isRunning = true;
         statusEl.textContent = 'Sprint live!';
         startTime = performance.now();
+        tierTimes = { 1: 0 };
         localStorage.setItem('fd-rug-tutorial', 'seen');
         loop();
       }
 
       function loop() {
         if (!isRunning) return;
+        const now = performance.now();
         velocity += gravity;
+        if (keysDown.has('Space') && runnerY > 0) {
+          velocity += 0.08;
+        }
         runnerY = Math.max(0, runnerY + velocity);
         if (runnerY === 0) {
           velocity = 0;
           jumpsAvailable = 2;
+          lastGroundedTime = now;
         }
         renderRunner();
-        const elapsed = (performance.now() - startTime) / 1000;
+        const elapsed = (now - startTime) / 1000;
+        const previousTier = difficultyTier;
         difficultyTier = 1 + Math.floor(elapsed / 20);
-        speed = 1 + (difficultyTier - 1) * 0.25;
+        tierTimes[difficultyTier] = (tierTimes[difficultyTier] || 0) + 1;
+        speed = 1 + (difficultyTier - 1) * 0.25 + (combo >= 3 ? 0.05 : 0) + (slideBoostTimer > 0 ? 0.15 : 0);
+        if (slideBoostTimer > 0) slideBoostTimer -= 1;
         distance += 0.3 * speed;
-        energy = Math.max(0, energy - 0.05 * speed);
-        tipEl.textContent = `Pace ${difficultyTier} • Speed x${speed.toFixed(2)} • Combo ${combo}x`;
+        let drain = (0.04 + difficultyTier * 0.006) * speed;
+        if (combo >= 3) drain -= 0.015 * Math.min(combo, 5);
+        if (hitCount === 0 && elapsed > 15) drain *= 0.92;
+        energy = Math.max(0, Math.min(130, energy - drain));
+        tipEl.textContent = `Pace ${difficultyTier} • Speed x${speed.toFixed(2)} • Combo ${combo}x${activeBuff ? ` • ${activeBuff}` : ''}`;
 
-        const spawnChance = Math.min(0.04 + difficultyTier * 0.01, 0.12);
+        if (distance >= nextBuffAt && !activeBuff) {
+          activeBuff = previousTier % 2 === 0 ? 'shield' : 'magnet';
+          buffTimer = 600;
+          nextBuffAt += 60;
+          localStorage.setItem('fd-rug-buff-hit', '1');
+          statusEl.textContent = `Buff gained: ${activeBuff}!`;
+        }
+        if (activeBuff) {
+          buffTimer -= 1;
+          if (buffTimer <= 0) {
+            activeBuff = null;
+          }
+        }
+
+        const spawnChance = graceTimer > 0 ? 0.02 : Math.min(0.05 + difficultyTier * 0.012, 0.15);
+        if (graceTimer > 0) {
+          graceTimer -= 1;
+        }
         if (Math.random() < spawnChance) {
-          const pattern = patterns[Math.floor(Math.random() * patterns.length)];
+          let pattern = patterns[Math.floor(Math.random() * patterns.length)];
+          if (obstacleStreak >= 2) {
+            pattern = patterns.find((p) => p.some((slot) => slot.type === 'pickup')) || pattern;
+            obstacleStreak = 0;
+          }
+          const hasObstacle = pattern.some((slot) => slot.type === 'obstacle');
+          obstacleStreak = hasObstacle ? obstacleStreak + 1 : 0;
           spawnPattern(pattern);
         }
 
@@ -421,6 +664,16 @@
         objects.forEach((obj) => {
           const left = (parseFloat(obj.el.style.left) || 100) - (1.6 + speed * 0.6);
           obj.el.style.left = `${left}%`;
+          if (obj.el.dataset.moving === '1') {
+            const wobble = Math.sin(now / 200 + left) * 12;
+            obj.el.style.bottom = `${32 + wobble}px`;
+          }
+          if (activeBuff === 'magnet' && obj.type === 'pickup') {
+            const targetBottom = 22 + runnerY + 12;
+            const currentBottom = parseFloat(obj.el.style.bottom) || 22;
+            obj.el.style.bottom = `${currentBottom + (targetBottom - currentBottom) * 0.08}px`;
+            obj.el.style.left = `${left - 0.4}%`;
+          }
         });
         objects = objects.filter((obj) => {
           const left = parseFloat(obj.el.style.left);
@@ -434,24 +687,45 @@
             runnerBox.right > objBox.left &&
             runnerBox.top < objBox.bottom &&
             runnerBox.bottom > objBox.top;
+          const nearMissZone =
+            obj.type === 'obstacle' &&
+            !collides &&
+            objBox.left < runnerBox.right + 8 &&
+            objBox.right > runnerBox.left - 8;
           if (collides) {
             if (obj.type === 'pickup') {
               distance += 3 + combo * 0.5;
-              energy = Math.min(100, energy + 10);
+              energy = Math.min(130, energy + 12);
               pickups += 1;
               combo += 1;
+              obstacleStreak = 0;
               bestCombo = Math.max(bestCombo, combo);
               localStorage.setItem('fd-rug-combo', String(bestCombo));
               statusEl.textContent = combo > 1 ? `Decor chain x${combo}!` : 'Decor snagged!';
             } else {
-              energy -= sliding ? 5 : 18;
-              statusEl.textContent = sliding ? 'Glancing blow while sliding.' : 'Ouch! Crate collision.';
-              runnerEl?.classList.add('hit');
-              setTimeout(() => runnerEl?.classList.remove('hit'), 350);
-              combo = 0;
+              if (activeBuff === 'shield') {
+                activeBuff = null;
+                statusEl.textContent = 'Shield blocked the hit!';
+              } else {
+                energy -= sliding ? 5 : 18;
+                statusEl.textContent = sliding ? 'Glancing blow while sliding.' : 'Ouch! Crate collision.';
+                runnerEl?.classList.add('hit');
+                track.classList.add('shake');
+                setTimeout(() => track.classList.remove('shake'), 400);
+                setTimeout(() => runnerEl?.classList.remove('hit'), 350);
+                combo = 0;
+                hitCount += 1;
+                graceTimer = 70;
+                lastHitTime = now;
+              }
+              obstacleStreak += 1;
             }
             obj.el.remove();
             return false;
+          } else if (nearMissZone && !obj.warned) {
+            nearMisses += 1;
+            statusEl.textContent = 'Close dodge!';
+            obj.warned = true;
           }
           return true;
         });
@@ -463,11 +737,15 @@
           statusEl.textContent = 'Energy out. Reset to sprint again.';
           summaryDistance.textContent = `${distance.toFixed(1)}m`;
           summaryPickups.textContent = `${pickups} pickups (best combo ${bestCombo}x)`;
+          const tiers = Object.entries(tierTimes)
+            .map(([tier, frames]) => `P${tier}: ${(frames / 60).toFixed(1)}s`)
+            .join(' · ');
           summaryBest.textContent = `${best.toFixed(1)}m`;
-          summaryText.textContent = `Pace ${difficultyTier}, speed x${speed.toFixed(2)}. Combos grant bonus meters—chain pickups to climb the leaderboard.`;
+          summaryText.textContent = `Hits ${hitCount}, near misses ${nearMisses}. ${tiers}. Buffs ${activeBuff ? 'active' : 'spent'}.`;
           summaryOverlay.classList.add('active');
         }
 
+        renderMissions();
         updateHUD();
         tickId = requestAnimationFrame(loop);
       }
@@ -498,7 +776,14 @@
         tutorialOverlay.classList.remove('active');
         statusEl.textContent = 'Tutorial skipped. Start sprint to play!';
       });
+      document
+        .querySelector('[data-action="replay-tutorial"]')
+        .addEventListener('click', () => {
+          summaryOverlay.classList.remove('active');
+          tutorialOverlay.classList.add('active');
+        });
       document.addEventListener('keydown', (e) => {
+        keysDown.add(e.code);
         if (e.code === 'Space') {
           e.preventDefault();
           jump();
@@ -509,12 +794,17 @@
         }
       });
 
+      document.addEventListener('keyup', (e) => {
+        keysDown.delete(e.code);
+      });
+
       bestCombo = Number(localStorage.getItem('fd-rug-combo') || 0);
       if (!localStorage.getItem('fd-rug-tutorial')) {
         tutorialOverlay.classList.add('active');
       }
 
       renderRunner();
+      renderMissions();
       updateHUD();
     </script>
   </body>
