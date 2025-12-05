@@ -1,75 +1,44 @@
-# React + TypeScript + Vite
+# FD Games Training Hub
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A static landing page for the FD Games collection. The root `index.html` renders the full hub without any dev server — just open the file in a browser to explore the training lineup, roadmap, and checklists.
 
-Currently, two official plugins are available:
+## Features
+- **Landing page:** Hero messaging, lineup cards for every kiosk game, roadmap, and a daily checklist with local persistence (no backend required).
+- **Game briefs:** `start/` includes stubs for each game with gameplay, controls, scoring, and branding hooks.
+- **Furniture Sales Training Game:** Scenario-based multiple choice with scoring, feedback, and a product catalog modal (React source remains in `src`).
+- **Policy Library:** Accordion-style references for common customer-facing policies (React source remains in `src`).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Getting started
+- Quick view: open `index.html` directly in your browser. No build or server needed.
+- React build (optional):
+  1. Install dependencies: `npm install`
+  2. Run locally: `npm run dev`
+  3. Build for production: `npm run build`
 
-## React Compiler
+## Game catalog
+Starter briefs live in `start/` for the following titles:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. Couch Stack (balance/placement)
+2. Room Rush (timed design puzzle)
+3. Find the Deal (hidden-object showroom)
+4. Memory Match: Furniture Edition
+5. Swipe Sort: Bedroom vs Living Room
+6. Price Is Right (Furniture Edition)
+7. Delivery Dash (lane runner)
+8. Rug Runner (endless runner)
+9. Build-a-Room: Before/After
+10. Sofa Tetris
 
-## Expanding the ESLint configuration
+## Game build checklist
+Track progress as we expand the library.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- [x] Static landing page in `index.html` (HTML/CSS/JS only)
+- [x] Furniture Sales Training Game prototype with scorekeeping
+- [x] Policy reference view linked from the landing page
+- [x] Dedicated `start/` folder with per-game briefs
+- [ ] Game-specific assets and prototypes added per title
+- [ ] Leaderboard + session tracking design
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-# FD-GAMES
-# FD-GAMES
+## Project notes
+- The landing hub runs entirely on static assets. Buttons in the lineup point to anchors for now; use the checklist to plan sessions.
+- React components and styles are still available in `src` if you want to resume the interactive build later.
