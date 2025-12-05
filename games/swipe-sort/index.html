@@ -3,22 +3,70 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Swipe Sort | FD Games</title>
+    <title>Swipe Sort Prototype | FD Games</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="../common.css" />
+    <style>
+      .board {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+
+      .dropzone {
+        border: 1px dashed rgba(255, 255, 255, 0.25);
+        border-radius: 14px;
+        padding: 1rem;
+        min-height: 200px;
+        background: rgba(255, 255, 255, 0.04);
+        display: grid;
+        gap: 0.6rem;
+      }
+
+      .card {
+        border-radius: 12px;
+        padding: 0.85rem;
+        background: linear-gradient(135deg, rgba(102, 224, 255, 0.15), rgba(255, 255, 255, 0.05));
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        display: grid;
+        gap: 0.35rem;
+      }
+
+      .card strong {
+        font-size: 1.1rem;
+      }
+
+      .actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-top: 0.75rem;
+      }
+
+      .pile {
+        display: grid;
+        gap: 0.5rem;
+      }
+
+      .pill.small {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.55rem;
+      }
+    </style>
   </head>
   <body>
     <header>
       <div class="navbar">
         <div class="nav-left">
           <span class="brand">FD Games</span>
-          <span class="pill">Swipe Sort</span>
+          <span class="pill">Prototype</span>
         </div>
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
           <a class="btn secondary" href="../../index.html">Back to hub</a>
-          <button class="btn outline" data-action="reset">Reset state</button>
+          <button class="btn outline" data-action="reset">Reset run</button>
         </div>
       </div>
     </header>
@@ -26,67 +74,181 @@
     <main class="container">
       <section class="hero">
         <div>
-          <p class="badge">Best starter</p>
-          <h1>Swipe items into the right room.</h1>
-          <p>
-            Add swipe/tap zones, streak multipliers, and category sets (Bedroom vs Living Room, plus Outdoor/Office/Kids).
-            The skeleton keeps your state and notes local.
-          </p>
-          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem;">
-            <button class="btn" data-action="start">Start sorting</button>
+          <p class="badge">Sort & swipe</p>
+          <h1>Bedroom vs Living Room prototype</h1>
+          <p>Swipe left or right to send each furniture card to the correct room. Keep your streak alive for bonus points.</p>
+          <div class="actions">
+            <button class="btn" data-action="draw">Draw next card</button>
             <a class="btn secondary" href="../../start/swipe-sort/README.md">View brief</a>
           </div>
-          <div class="status" style="margin-top: 1rem;">
-            <span class="status-indicator"></span>
-            <span data-status>Awaiting swipe zones.</span>
+          <div class="hud" style="margin-top: 0.5rem;">
+            <div class="stat"><span>Score</span><strong data-score>0</strong></div>
+            <div class="stat"><span>Streak</span><strong data-streak>0</strong></div>
+            <div class="stat"><span>Best streak</span><strong data-best>0</strong></div>
           </div>
+          <p class="muted" style="margin-top: 0.6rem;" data-status>Tap a target zone or use the buttons below.</p>
         </div>
         <div class="panel">
-          <h3 class="section-title">Swipe lanes</h3>
-          <p class="muted">Use this block for big swipe zones or on-screen buttons.</p>
-          <div class="placeholder-area">Swipe area placeholder.</div>
+          <h3 class="section-title">Current card</h3>
+          <div class="pile" id="current"></div>
+          <div class="actions">
+            <button class="btn" data-action="living">Send to living room →</button>
+            <button class="btn secondary" data-action="bedroom">← Send to bedroom</button>
+          </div>
         </div>
       </section>
 
-      <section style="margin-top: 1.5rem;" class="subgrid">
-        <div class="panel">
-          <h3 class="section-title">Build checklist</h3>
-          <div class="checklist" style="display: grid; gap: 0.75rem;">
-            <label><input type="checkbox" data-check="lanes" />Left/right (or up/down) lane detection.</label>
-            <label><input type="checkbox" data-check="streaks" />Streak multiplier with miss reset.</label>
-            <label><input type="checkbox" data-check="categories" />Category sets: Bedroom/Living + optional modes.</label>
+      <section style="margin-top: 1.25rem;" class="board">
+        <div class="panel dropzone" data-zone="bedroom">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h3 class="section-title">Bedroom</h3>
+            <span class="pill small">Swipe left</span>
           </div>
+          <div class="pile" data-list="bedroom"></div>
         </div>
-        <div class="panel">
-          <h3 class="section-title">Design notes</h3>
-          <ul class="muted" style="line-height: 1.6; padding-left: 1.1rem;">
-            <li>Big targets for kiosks; add tap fallback for desktop.</li>
-            <li>Audio ticks for streaks and errors.</li>
-            <li>Queue items from branded catalog art.</li>
-          </ul>
-        </div>
-        <div class="panel">
-          <h3 class="section-title">Session notes</h3>
-          <p class="muted">Fast jot for findings or tweaks. Saved locally.</p>
-          <textarea data-note rows="6" style="width: 100%; border-radius: 12px; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: var(--text);"></textarea>
+        <div class="panel dropzone" data-zone="living">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h3 class="section-title">Living Room</h3>
+            <span class="pill small">Swipe right</span>
+          </div>
+          <div class="pile" data-list="living"></div>
         </div>
       </section>
 
-      <section style="margin-top: 1.5rem;" class="panel">
-        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
-          <div>
-            <h3 class="section-title">Activity log</h3>
-            <p class="muted" style="margin: 0;">Start/reset clicks appear here.</p>
-          </div>
-          <a class="btn secondary" href="../../README.md">Repo notes</a>
-        </div>
-        <ul class="log" data-log style="margin-top: 0.75rem;"></ul>
+      <section style="margin-top: 1.25rem;" class="panel">
+        <h3 class="section-title">Note to self</h3>
+        <textarea data-note rows="4" style="width: 100%; border-radius: 12px; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: var(--text);"></textarea>
       </section>
     </main>
 
-    <script src="../common.js"></script>
     <script>
-      initGameSkeleton({ slug: 'swipe-sort', title: 'Swipe Sort', defaultStatus: 'Swipe zones coming up.' });
+      const deck = [
+        { name: 'Nightstand', category: 'bedroom', detail: 'Pair with bedside lamp.' },
+        { name: 'Duvet', category: 'bedroom', detail: 'Layered neutral tones.' },
+        { name: 'Wardrobe', category: 'bedroom', detail: 'Soft-close doors.' },
+        { name: 'Throw pillows', category: 'living', detail: 'Mix patterns + solids.' },
+        { name: 'Coffee table', category: 'living', detail: 'Storage shelf underneath.' },
+        { name: 'Media console', category: 'living', detail: 'Cable passthroughs.' },
+        { name: 'Bed frame', category: 'bedroom', detail: 'Upholstered headboard.' },
+        { name: 'Side table', category: 'living', detail: 'Metallic accent.' },
+        { name: 'Desk lamp', category: 'bedroom', detail: 'Warm dimming LED.' },
+        { name: 'Chaise', category: 'living', detail: 'Performance fabric.' },
+        { name: 'Bookcase', category: 'living', detail: 'Open shelving.' },
+        { name: 'Area rug', category: 'bedroom', detail: 'Soft underfoot.' },
+        { name: 'Curtains', category: 'bedroom', detail: 'Blackout lining.' },
+        { name: 'Wall art', category: 'living', detail: 'Oversized canvas.' },
+      ];
+
+      const statusEl = document.querySelector('[data-status]');
+      const scoreEl = document.querySelector('[data-score]');
+      const streakEl = document.querySelector('[data-streak]');
+      const bestEl = document.querySelector('[data-best]');
+      const currentPile = document.getElementById('current');
+      const note = document.querySelector('[data-note]');
+      const lists = {
+        bedroom: document.querySelector('[data-list="bedroom"]'),
+        living: document.querySelector('[data-list="living"]'),
+      };
+
+      let currentCard = null;
+      let remaining = [];
+      let score = 0;
+      let streak = 0;
+      let best = Number(localStorage.getItem('fd-swipe-best') || 0);
+
+      function updateHUD() {
+        scoreEl.textContent = score;
+        streakEl.textContent = streak;
+        bestEl.textContent = best;
+      }
+
+      function drawCard() {
+        if (!remaining.length) {
+          remaining = [...deck].sort(() => Math.random() - 0.5);
+          statusEl.textContent = 'Fresh deck shuffled. Keep sorting!';
+        }
+        currentCard = remaining.pop();
+        renderCurrent();
+      }
+
+      function renderCurrent() {
+        currentPile.innerHTML = '';
+        if (!currentCard) {
+          const p = document.createElement('p');
+          p.className = 'muted';
+          p.textContent = 'No card drawn yet.';
+          currentPile.appendChild(p);
+          return;
+        }
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `<strong>${currentCard.name}</strong><span class="muted">${currentCard.detail}</span>`;
+        currentPile.appendChild(card);
+      }
+
+      function dropTo(zone) {
+        if (!currentCard) {
+          statusEl.textContent = 'Draw a card first.';
+          return;
+        }
+        const correct = currentCard.category === zone;
+        const entry = document.createElement('div');
+        entry.className = 'card';
+        entry.innerHTML = `<strong>${currentCard.name}</strong><span class="muted">${currentCard.detail}</span>`;
+        lists[zone].prepend(entry);
+        if (correct) {
+          score += 10 + streak * 2;
+          streak += 1;
+          statusEl.textContent = `Correct: ${currentCard.name} belongs in the ${zone}.`;
+          best = Math.max(best, streak);
+          localStorage.setItem('fd-swipe-best', best);
+        } else {
+          statusEl.textContent = `Oops! ${currentCard.name} was for the ${currentCard.category}. Streak reset.`;
+          streak = 0;
+        }
+        currentCard = null;
+        updateHUD();
+        renderCurrent();
+      }
+
+      document.querySelector('[data-action="draw"]').addEventListener('click', drawCard);
+      document.querySelector('[data-action="bedroom"]').addEventListener('click', () => dropTo('bedroom'));
+      document.querySelector('[data-action="living"]').addEventListener('click', () => dropTo('living'));
+      document.querySelector('[data-action="reset"]').addEventListener('click', () => {
+        remaining = [...deck];
+        score = 0;
+        streak = 0;
+        lists.bedroom.innerHTML = '';
+        lists.living.innerHTML = '';
+        currentCard = null;
+        statusEl.textContent = 'Run cleared. Draw a card to start again.';
+        updateHUD();
+        renderCurrent();
+      });
+
+      document.querySelectorAll('.dropzone').forEach((zone) => {
+        zone.addEventListener('click', () => dropTo(zone.dataset.zone));
+      });
+
+      note.value = localStorage.getItem('fd-swipe-note') || '';
+      note.addEventListener('input', () => localStorage.setItem('fd-swipe-note', note.value));
+
+      // touch swipe support
+      let startX = null;
+      document.addEventListener('touchstart', (e) => {
+        startX = e.changedTouches[0].clientX;
+      });
+      document.addEventListener('touchend', (e) => {
+        if (startX === null) return;
+        const delta = e.changedTouches[0].clientX - startX;
+        if (Math.abs(delta) > 40) {
+          dropTo(delta > 0 ? 'living' : 'bedroom');
+        }
+        startX = null;
+      });
+
+      updateHUD();
+      renderCurrent();
     </script>
   </body>
 </html>

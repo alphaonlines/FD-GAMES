@@ -3,22 +3,87 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Memory Match: Furniture Edition | FD Games</title>
+    <title>Memory Match Prototype | FD Games</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="../common.css" />
+    <style>
+      .hud {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 0.65rem;
+        margin-top: 0.75rem;
+      }
+
+      .stat {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 0.65rem 0.75rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+        gap: 0.6rem;
+        margin-top: 1rem;
+      }
+
+      .card {
+        position: relative;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: radial-gradient(circle at 30% 30%, rgba(102, 224, 255, 0.06), rgba(255, 255, 255, 0.02));
+        border-radius: 12px;
+        padding: 1.1rem;
+        display: grid;
+        place-items: center;
+        font-size: 1.35rem;
+        cursor: pointer;
+        transition: transform 120ms ease, border-color 120ms ease;
+      }
+
+      .card.revealed,
+      .card.matched {
+        border-color: rgba(102, 224, 255, 0.45);
+        transform: translateY(-2px);
+        background: rgba(102, 224, 255, 0.08);
+      }
+
+      .card.matched {
+        background: rgba(34, 197, 94, 0.14);
+        color: #c4f0d2;
+      }
+
+      .card::after {
+        content: attr(data-label);
+        position: absolute;
+        bottom: 8px;
+        right: 10px;
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      .toolbar {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+    </style>
   </head>
   <body>
     <header>
       <div class="navbar">
         <div class="nav-left">
           <span class="brand">FD Games</span>
-          <span class="pill">Memory Match</span>
+          <span class="pill">Prototype</span>
         </div>
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
           <a class="btn secondary" href="../../index.html">Back to hub</a>
-          <button class="btn outline" data-action="reset">Reset state</button>
+          <button class="btn outline" data-action="reset">Reset board</button>
         </div>
       </div>
     </header>
@@ -26,67 +91,188 @@
     <main class="container">
       <section class="hero">
         <div>
-          <p class="badge">Best starter</p>
-          <h1>Flip FD silhouettes, fabrics, and logos.</h1>
+          <p class="badge">Flip & match</p>
+          <h1>Memory Match prototype</h1>
           <p>
-            Snap in your tile grid, flip animations, and match logic. Score fewer moves and faster time; offer hard mode by
-            expanding the grid.
+            Tap cards to reveal furniture icons, clear the board in as few moves as possible, and try the harder 6x6 layout
+            when you are ready. Best times are stored locally per mode.
           </p>
-          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem;">
-            <button class="btn" data-action="start">Start match</button>
+          <div class="toolbar" style="margin-top: 1rem;">
+            <button class="btn" data-action="start">New 4x4 game</button>
+            <button class="btn secondary" data-action="hard">New 6x6 game</button>
             <a class="btn secondary" href="../../start/memory-match-furniture-edition/README.md">View brief</a>
           </div>
-          <div class="status" style="margin-top: 1rem;">
-            <span class="status-indicator"></span>
-            <span data-status>Waiting for tile set.</span>
+          <div class="hud">
+            <div class="stat"><span>Moves</span><strong data-moves>0</strong></div>
+            <div class="stat"><span>Time</span><strong data-time>0.0s</strong></div>
+            <div class="stat"><span>Best (mode)</span><strong data-best>—</strong></div>
           </div>
         </div>
         <div class="panel">
-          <h3 class="section-title">Grid</h3>
-          <p class="muted">Drop a 4x4 or 6x6 grid here with flip animations.</p>
-          <div class="placeholder-area">Tile grid placeholder.</div>
+          <h3 class="section-title">Board</h3>
+          <div id="board" class="grid" aria-live="polite"></div>
+          <p class="muted" style="margin-top: 0.75rem;" data-status>Pick a mode to start matching.</p>
         </div>
       </section>
 
-      <section style="margin-top: 1.5rem;" class="subgrid">
-        <div class="panel">
-          <h3 class="section-title">Build checklist</h3>
-          <div class="checklist" style="display: grid; gap: 0.75rem;">
-            <label><input type="checkbox" data-check="grid" />Generate shuffled tile pairs.</label>
-            <label><input type="checkbox" data-check="timing" />Timer + move counter with best score memory.</label>
-            <label><input type="checkbox" data-check="hard" />Hard mode toggle (6x6) with extra pairs.</label>
-          </div>
-        </div>
-        <div class="panel">
-          <h3 class="section-title">Design notes</h3>
-          <ul class="muted" style="line-height: 1.6; padding-left: 1.1rem;">
-            <li>Use FD fabrics/textures for quick brand tie-in.</li>
-            <li>Touch-friendly tap targets with clear states.</li>
-            <li>Track streaks for consecutive correct matches.</li>
-          </ul>
-        </div>
-        <div class="panel">
-          <h3 class="section-title">Session notes</h3>
-          <p class="muted">Fast jot for findings or tweaks. Saved locally.</p>
-          <textarea data-note rows="6" style="width: 100%; border-radius: 12px; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: var(--text);"></textarea>
-        </div>
-      </section>
-
-      <section style="margin-top: 1.5rem;" class="panel">
-        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
+      <section style="margin-top: 1.25rem;" class="panel">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap;">
           <div>
-            <h3 class="section-title">Activity log</h3>
-            <p class="muted" style="margin: 0;">Use for event wiring as you build.</p>
+            <h3 class="section-title">Build notes</h3>
+            <p class="muted" style="margin: 0;">Capture feedback as you tune pacing or art.</p>
           </div>
           <a class="btn secondary" href="../../README.md">Repo notes</a>
         </div>
-        <ul class="log" data-log style="margin-top: 0.75rem;"></ul>
+        <textarea data-note rows="5" style="width: 100%; margin-top: 0.5rem; border-radius: 12px; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: var(--text);"></textarea>
       </section>
     </main>
 
-    <script src="../common.js"></script>
     <script>
-      initGameSkeleton({ slug: 'memory-match', title: 'Memory Match', defaultStatus: 'Tiles ready soon.' });
+      const icons = ['🛋️', '🪑', '🪞', '🛏️', '🪟', '🧴', '🪴', '🪜', '🧺', '🖼️', '🛒', '📦', '🏷️', '💡', '🧸', '🧽', '🧱', '🛠️'];
+      const board = document.getElementById('board');
+      const statusEl = document.querySelector('[data-status]');
+      const movesEl = document.querySelector('[data-moves]');
+      const timeEl = document.querySelector('[data-time]');
+      const bestEl = document.querySelector('[data-best]');
+      const note = document.querySelector('[data-note]');
+      let timerId = null;
+      let startTime = 0;
+      let firstPick = null;
+      let lock = false;
+      let matches = 0;
+      let gridSize = 4;
+
+      const bestKey = (size) => `fd-memory-best-${size}`;
+
+      function formatTime(ms) {
+        return `${(ms / 1000).toFixed(1)}s`;
+      }
+
+      function updateBestDisplay() {
+        const best = localStorage.getItem(bestKey(gridSize));
+        bestEl.textContent = best ? `${formatTime(Number(best))} (${gridSize}x${gridSize})` : '—';
+      }
+
+      function stopTimer() {
+        if (timerId) {
+          cancelAnimationFrame(timerId);
+          timerId = null;
+        }
+      }
+
+      function tick() {
+        const elapsed = Date.now() - startTime;
+        timeEl.textContent = formatTime(elapsed);
+        timerId = requestAnimationFrame(tick);
+      }
+
+      function startTimer() {
+        startTime = Date.now();
+        stopTimer();
+        tick();
+      }
+
+      function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i -= 1) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+      }
+
+      function createDeck(size) {
+        const neededPairs = (size * size) / 2;
+        const picks = shuffle([...icons]).slice(0, neededPairs);
+        return shuffle([...picks, ...picks]).map((icon, index) => ({ id: index, icon, revealed: false, matched: false }));
+      }
+
+      function render(deck) {
+        board.style.gridTemplateColumns = `repeat(${gridSize}, minmax(80px, 1fr))`;
+        board.innerHTML = '';
+        deck.forEach((card, idx) => {
+          const btn = document.createElement('button');
+          btn.className = 'card';
+          btn.setAttribute('data-label', idx + 1);
+          btn.dataset.index = idx;
+          btn.type = 'button';
+          btn.textContent = card.revealed || card.matched ? card.icon : '🎴';
+          if (card.revealed) btn.classList.add('revealed');
+          if (card.matched) btn.classList.add('matched');
+          btn.addEventListener('click', () => onFlip(deck, idx));
+          board.appendChild(btn);
+        });
+      }
+
+      function setStatus(text) {
+        statusEl.textContent = text;
+      }
+
+      function onFlip(deck, index) {
+        const card = deck[index];
+        if (lock || card.revealed || card.matched) return;
+        card.revealed = true;
+        render(deck);
+
+        if (!firstPick) {
+          firstPick = card;
+          return;
+        }
+
+        lock = true;
+        movesEl.textContent = Number(movesEl.textContent) + 1;
+
+        if (card.icon === firstPick.icon) {
+          card.matched = true;
+          const previous = deck.find((c) => c.id === firstPick.id);
+          if (previous) previous.matched = true;
+          matches += 1;
+          setStatus(`Matched ${matches} / ${(gridSize * gridSize) / 2} pairs.`);
+          lock = false;
+          firstPick = null;
+          render(deck);
+          if (matches === (gridSize * gridSize) / 2) {
+            stopTimer();
+            const elapsed = Date.now() - startTime;
+            const best = localStorage.getItem(bestKey(gridSize));
+            if (!best || elapsed < Number(best)) {
+              localStorage.setItem(bestKey(gridSize), String(elapsed));
+            }
+            updateBestDisplay();
+            setStatus('Board cleared! Try to beat your best time.');
+          }
+          return;
+        }
+
+        setTimeout(() => {
+          card.revealed = false;
+          const previous = deck.find((c) => c.id === firstPick.id);
+          if (previous) previous.revealed = false;
+          firstPick = null;
+          lock = false;
+          render(deck);
+        }, 650);
+      }
+
+      function startGame(size) {
+        gridSize = size;
+        firstPick = null;
+        lock = false;
+        matches = 0;
+        movesEl.textContent = '0';
+        timeEl.textContent = '0.0s';
+        updateBestDisplay();
+        const deck = createDeck(size);
+        render(deck);
+        setStatus(`Prototype running: ${size}x${size} grid.`);
+        startTimer();
+      }
+
+      document.querySelector('[data-action="start"]').addEventListener('click', () => startGame(4));
+      document.querySelector('[data-action="hard"]').addEventListener('click', () => startGame(6));
+      document.querySelector('[data-action="reset"]').addEventListener('click', () => startGame(gridSize));
+
+      note.value = localStorage.getItem('fd-memory-note') || '';
+      note.addEventListener('input', () => localStorage.setItem('fd-memory-note', note.value));
     </script>
   </body>
 </html>
