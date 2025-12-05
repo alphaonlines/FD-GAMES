@@ -1,42 +1,55 @@
+:root {
+  background-color: #f6f7fb;
+}
+
 #root {
-  max-width: 1280px;
+  width: 100%;
   margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  min-height: 100vh;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+body {
+  background-color: #f6f7fb;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
+.app {
+  color: #1f2937;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.navbar-brand {
+  color: #0d6efd;
+}
+
+.navbar-brand:hover {
+  color: #0a58ca;
+}
+
+.nav-link {
+  color: #4b5563;
+}
+
+.nav-link.active,
+.nav-link:hover {
+  color: #0d6efd;
+}
+
+.main-content {
+  padding: 2rem 0;
+}
+
+.landing .landing-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+}
+
+.landing ul li strong {
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+@media (max-width: 576px) {
+  .main-content {
+    padding: 1.5rem 0;
   }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
 }
