@@ -1,75 +1,29 @@
-# React + TypeScript + Vite
+# FD Games Training Hub
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A static landing page for the FD Games collection. The root `index.html` now renders the full hub without any dev server — just open the file in a browser to explore the training lineup and checklist.
 
-Currently, two official plugins are available:
+## Features
+- **Landing page:** Hero messaging, lineup cards, roadmap, and a daily checklist with local persistence (no backend required).
+- **Furniture Sales Training Game:** Scenario-based multiple choice with scoring, feedback, and a product catalog modal (React source remains in `src`).
+- **Policy Library:** Accordion-style references for common customer-facing policies (React source remains in `src`).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Getting started
+- Quick view: open `index.html` directly in your browser. No build or server needed.
+- React build (optional):
+  1. Install dependencies: `npm install`
+  2. Run locally: `npm run dev`
+  3. Build for production: `npm run build`
 
-## React Compiler
+## Game checklist
+Track progress as we expand the library.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- [x] Static landing page in `index.html` (HTML/CSS/JS only)
+- [x] Furniture Sales Training Game prototype with scorekeeping
+- [x] Policy reference view linked from the landing page
+- [ ] Dedicated `start/` folder with per-game assets
+- [ ] Game-specific README files and content briefs
+- [ ] Additional training games and scenarios
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-# FD-GAMES
-# FD-GAMES
+## Project notes
+- The landing hub runs entirely on static assets. Buttons in the lineup are placeholders for now; use the checklist to plan sessions.
+- React components and styles are still available in `src` if you want to resume the interactive build later.
