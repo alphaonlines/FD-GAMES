@@ -1,28 +1,44 @@
 # FD Games Training Hub
 
-A React + TypeScript + Vite landing experience for the FD Games collection. The root `index.html` hosts a home screen that routes
-into the Furniture Sales Training Game and quick policy references.
+A static landing page for the FD Games collection. The root `index.html` renders the full hub without any dev server — just open the file in a browser to explore the training lineup, roadmap, and checklists.
 
 ## Features
-- **Landing page:** Hero messaging with quick-start buttons and feature highlights for the current training experiences.
-- **Furniture Sales Training Game:** Scenario-based multiple choice training with scoring, feedback, and a product catalog modal.
-- **Policy Library:** Accordion-style references for common customer-facing policies.
+- **Landing page:** Hero messaging, lineup cards for every kiosk game, roadmap, and a daily checklist with local persistence (no backend required).
+- **Game briefs:** `start/` includes stubs for each game with gameplay, controls, scoring, and branding hooks.
+- **Furniture Sales Training Game:** Scenario-based multiple choice with scoring, feedback, and a product catalog modal (React source remains in `src`).
+- **Policy Library:** Accordion-style references for common customer-facing policies (React source remains in `src`).
 
 ## Getting started
-1. Install dependencies: `npm install`
-2. Run locally: `npm run dev`
-3. Build for production: `npm run build`
+- Quick view: open `index.html` directly in your browser. No build or server needed.
+- React build (optional):
+  1. Install dependencies: `npm install`
+  2. Run locally: `npm run dev`
+  3. Build for production: `npm run build`
 
-## Game checklist
+## Game catalog
+Starter briefs live in `start/` for the following titles:
+
+1. Couch Stack (balance/placement)
+2. Room Rush (timed design puzzle)
+3. Find the Deal (hidden-object showroom)
+4. Memory Match: Furniture Edition
+5. Swipe Sort: Bedroom vs Living Room
+6. Price Is Right (Furniture Edition)
+7. Delivery Dash (lane runner)
+8. Rug Runner (endless runner)
+9. Build-a-Room: Before/After
+10. Sofa Tetris
+
+## Game build checklist
 Track progress as we expand the library.
 
-- [x] Landing page entry point in `index.html` and React UI
+- [x] Static landing page in `index.html` (HTML/CSS/JS only)
 - [x] Furniture Sales Training Game prototype with scorekeeping
 - [x] Policy reference view linked from the landing page
-- [ ] Dedicated `start/` folder with per-game assets
-- [ ] Game-specific README files and content briefs
-- [ ] Additional training games and scenarios
+- [x] Dedicated `start/` folder with per-game briefs
+- [ ] Game-specific assets and prototypes added per title
+- [ ] Leaderboard + session tracking design
 
 ## Project notes
-- The landing view is the default route and uses the top navigation to jump into the existing game and policy views.
-- Styling uses Bootstrap 5 plus light custom theming in `src/App.css`.
+- The landing hub runs entirely on static assets. Buttons in the lineup point to anchors for now; use the checklist to plan sessions.
+- React components and styles are still available in `src` if you want to resume the interactive build later.

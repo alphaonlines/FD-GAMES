@@ -256,6 +256,7 @@
         </div>
         <div class="d-flex flex-wrap gap-2">
           <a class="btn btn-ghost" href="#games">View games</a>
+          <a class="btn btn-ghost" href="#build-tracker">Game checklist</a>
           <a class="btn btn-cta" href="#checklist">Session checklist</a>
         </div>
       </nav>
@@ -301,53 +302,175 @@
         </div>
       </section>
 
+      <section id="build-tracker" class="mb-5">
+        <p class="tag mb-2">Build tracker</p>
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+          <h2 class="section-title mb-0">Game checklist</h2>
+          <span class="muted">Progress saves locally so you can keep the kiosk plan updated.</span>
+        </div>
+        <div class="card-grid checklist">
+          <label class="item" for="build-couch-stack">
+            <input id="build-couch-stack" type="checkbox" data-key="build-couch-stack" />
+            <div>
+              <h4 class="mb-1">Couch Stack</h4>
+              <p class="muted mb-0">Drag/drop balance prototype with FD silhouettes and perfect-placement bonuses.</p>
+            </div>
+          </label>
+          <label class="item" for="build-room-rush">
+            <input id="build-room-rush" type="checkbox" data-key="build-room-rush" />
+            <div>
+              <h4 class="mb-1">Room Rush</h4>
+              <p class="muted mb-0">Timed checklist puzzle with snap-to-grid placement and style-matching scores.</p>
+            </div>
+          </label>
+          <label class="item" for="build-find-deal">
+            <input id="build-find-deal" type="checkbox" data-key="build-find-deal" />
+            <div>
+              <h4 class="mb-1">Find the Deal</h4>
+              <p class="muted mb-0">Hidden-object scenes with weekly promo swaps and hint timers.</p>
+            </div>
+          </label>
+          <label class="item" for="build-memory-match">
+            <input id="build-memory-match" type="checkbox" data-key="build-memory-match" />
+            <div>
+              <h4 class="mb-1">Memory Match</h4>
+              <p class="muted mb-0">Tile flips using FD logos, fabrics, and silhouettes with Hard mode grids.</p>
+            </div>
+          </label>
+          <label class="item" for="build-swipe-sort">
+            <input id="build-swipe-sort" type="checkbox" data-key="build-swipe-sort" />
+            <div>
+              <h4 class="mb-1">Swipe Sort</h4>
+              <p class="muted mb-0">Swipe/tap sorting for Bedroom vs Living Room, with streak multipliers.</p>
+            </div>
+          </label>
+          <label class="item" for="build-price-right">
+            <input id="build-price-right" type="checkbox" data-key="build-price-right" />
+            <div>
+              <h4 class="mb-1">Price Is Right</h4>
+              <p class="muted mb-0">Pricing guesses with huge buttons and streak bonuses.</p>
+            </div>
+          </label>
+          <label class="item" for="build-delivery-dash">
+            <input id="build-delivery-dash" type="checkbox" data-key="build-delivery-dash" />
+            <div>
+              <h4 class="mb-1">Delivery Dash</h4>
+              <p class="muted mb-0">Lane runner with FD-branded truck wraps and flawless-run bonuses.</p>
+            </div>
+          </label>
+          <label class="item" for="build-rug-runner">
+            <input id="build-rug-runner" type="checkbox" data-key="build-rug-runner" />
+            <div>
+              <h4 class="mb-1">Rug Runner</h4>
+              <p class="muted mb-0">Endless runner collecting décor pickups with combo paths.</p>
+            </div>
+          </label>
+          <label class="item" for="build-build-room">
+            <input id="build-build-room" type="checkbox" data-key="build-build-room" />
+            <div>
+              <h4 class="mb-1">Build-a-Room</h4>
+              <p class="muted mb-0">Before/after upgrades with objective scoring and comfort meter.</p>
+            </div>
+          </label>
+          <label class="item" for="build-sofa-tetris">
+            <input id="build-sofa-tetris" type="checkbox" data-key="build-sofa-tetris" />
+            <div>
+              <h4 class="mb-1">Sofa Tetris</h4>
+              <p class="muted mb-0">Furniture silhouette block-fitting with combo clears.</p>
+            </div>
+          </label>
+        </div>
+      </section>
+
       <section id="games" class="mb-5">
         <div class="d-flex align-items-center justify-content-between mb-3 flex-wrap gap-2">
           <div>
             <p class="tag mb-2">Games</p>
             <h2 class="section-title mb-1">Training lineup</h2>
-            <p class="muted mb-0">Pick a module and pair it with today’s policy focus.</p>
+            <p class="muted mb-0">Touch-friendly kiosk concepts with FD-branded assets and scorekeeping.</p>
           </div>
-          <a class="btn btn-ghost" href="#checklist">Log today’s session</a>
+          <a class="btn btn-ghost" href="start/README.md">Open start folder</a>
         </div>
         <div class="card-grid">
           <div class="tile">
             <div class="d-flex align-items-center justify-content-between mb-2">
-              <h3 class="mb-0">Furniture Sales Training</h3>
-              <span class="tag">Score + Feedback</span>
+              <h3 class="mb-0">Couch Stack</h3>
+              <span class="tag">Balance / Placement</span>
             </div>
-            <p class="muted">
-              Scenario-based multiple choice with live scoring, contextual feedback, and a product catalog modal to reinforce
-              the pitch.
-            </p>
-            <div class="d-flex gap-2 flex-wrap">
-              <button class="btn btn-cta" type="button">Start session</button>
-              <button class="btn btn-ghost" type="button">Review catalog</button>
-            </div>
+            <p class="muted">Drag-and-drop furniture silhouettes onto a moving platform and keep the stack from tipping.</p>
+            <p class="muted mb-0"><strong>Scoring:</strong> Time survived + items placed + perfect placement bonuses.</p>
           </div>
           <div class="tile">
             <div class="d-flex align-items-center justify-content-between mb-2">
-              <h3 class="mb-0">Policy Library</h3>
-              <span class="tag">Quick reference</span>
+              <h3 class="mb-0">Room Rush</h3>
+              <span class="tag">Timed design</span>
             </div>
-            <p class="muted">
-              Collapsible accordion of common customer-facing policies. Use it as a warm-up or between scenarios to stay sharp.
-            </p>
-            <div class="d-flex gap-2 flex-wrap">
-              <button class="btn btn-ghost" type="button">View policies</button>
-            </div>
+            <p class="muted">Fill a blank room from a checklist before time runs out using snap-to-grid placement.</p>
+            <p class="muted mb-0"><strong>Scoring:</strong> Speed + style match + no overlaps.</p>
           </div>
           <div class="tile">
             <div class="d-flex align-items-center justify-content-between mb-2">
-              <h3 class="mb-0">New modules</h3>
-              <span class="tag">Coming soon</span>
+              <h3 class="mb-0">Find the Deal</h3>
+              <span class="tag">Hidden object</span>
             </div>
-            <p class="muted">
-              Use the roadmap below to track which scenarios, policy bundles, and assets we’ll add to the <code>start/</code> folder next.
-            </p>
-            <div class="d-flex gap-2 flex-wrap">
-              <button class="btn btn-ghost" type="button">Follow roadmap</button>
+            <p class="muted">Tap the hidden sale tag or featured product inside a crowded showroom scene.</p>
+            <p class="muted mb-0"><strong>Scoring:</strong> Fastest time with fewer hints.</p>
+          </div>
+          <div class="tile">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <h3 class="mb-0">Memory Match</h3>
+              <span class="tag">Best starter</span>
             </div>
+            <p class="muted">Flip tiles to match pairs of FD silhouettes, fabrics, or logos. Hard mode supports larger grids.</p>
+            <p class="muted mb-0"><strong>Scoring:</strong> Fewer moves + faster time; streaks for consecutive matches.</p>
+          </div>
+          <div class="tile">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <h3 class="mb-0">Swipe Sort</h3>
+              <span class="tag">Best starter</span>
+            </div>
+            <p class="muted">Swipe items into Bedroom vs Living Room (and optional Outdoor/Office/Kids) with streak multipliers.</p>
+            <p class="muted mb-0"><strong>Scoring:</strong> Accuracy + streak multiplier + optional time bonus.</p>
+          </div>
+          <div class="tile">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <h3 class="mb-0">Price Is Right</h3>
+              <span class="tag">Pricing challenge</span>
+            </div>
+            <p class="muted">Guess if the item is above/below a price or pick the closest range using huge buttons.</p>
+            <p class="muted mb-0"><strong>Scoring:</strong> Correct streaks + time bonus.</p>
+          </div>
+          <div class="tile">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <h3 class="mb-0">Delivery Dash</h3>
+              <span class="tag">Lane runner</span>
+            </div>
+            <p class="muted">Swipe lanes as a delivery truck to dodge traffic and collect 5-star reviews.</p>
+            <p class="muted mb-0"><strong>Scoring:</strong> Distance + pickups; flawless runs score extra.</p>
+          </div>
+          <div class="tile">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <h3 class="mb-0">Rug Runner</h3>
+              <span class="tag">Endless runner</span>
+            </div>
+            <p class="muted">Roll out a rug, dodge obstacles, and collect pillows/throws for combo pickups.</p>
+            <p class="muted mb-0"><strong>Scoring:</strong> Distance + combo bonuses + streaks.</p>
+          </div>
+          <div class="tile">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <h3 class="mb-0">Build-a-Room</h3>
+              <span class="tag">Before/After</span>
+            </div>
+            <p class="muted">Upgrade an ugly room by dragging improvements to raise its comfort score and objectives.</p>
+            <p class="muted mb-0"><strong>Scoring:</strong> Objective completion + speed; leaderboards for top makeovers.</p>
+          </div>
+          <div class="tile">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <h3 class="mb-0">Sofa Tetris</h3>
+              <span class="tag">Block fitting</span>
+            </div>
+            <p class="muted">Classic line-clearing with furniture silhouettes (sectionals, chairs, ottomans).</p>
+            <p class="muted mb-0"><strong>Scoring:</strong> Lines cleared + combo bonuses; speed ramps as you level up.</p>
           </div>
         </div>
       </section>
