@@ -4,12 +4,13 @@ A static landing page for the FD Games collection. The root `index.html` renders
 
 ## Features
 - **Landing page:** Hero messaging, lineup cards for every kiosk game, roadmap, and a daily checklist with local persistence (no backend required).
+- **Game skeletons:** Static HTML/CSS/JS shells for every title live in `games/` and open directly from the landing cards.
 - **Game briefs:** `start/` includes stubs for each game with gameplay, controls, scoring, and branding hooks.
 - **Furniture Sales Training Game:** Scenario-based multiple choice with scoring, feedback, and a product catalog modal (React source remains in `src`).
 - **Policy Library:** Accordion-style references for common customer-facing policies (React source remains in `src`).
 
 ## Getting started
-- Quick view: open `index.html` directly in your browser. No build or server needed.
+- Quick view: open `index.html` directly in your browser. No build or server needed. Use the lineup buttons to launch each game skeleton.
 - React build (optional):
   1. Install dependencies: `npm install`
   2. Run locally: `npm run dev`
@@ -33,6 +34,7 @@ Starter briefs live in `start/` for the following titles:
 Track progress as we expand the library.
 
 - [x] Static landing page in `index.html` (HTML/CSS/JS only)
+- [x] Static skeleton pages for each game in `games/`
 - [x] Furniture Sales Training Game prototype with scorekeeping
 - [x] Policy reference view linked from the landing page
 - [x] Dedicated `start/` folder with per-game briefs
@@ -40,5 +42,5 @@ Track progress as we expand the library.
 - [ ] Leaderboard + session tracking design
 
 ## Project notes
-- The landing hub runs entirely on static assets. Buttons in the lineup point to anchors for now; use the checklist to plan sessions.
+- The landing hub runs entirely on static assets. Lineup buttons now open each game skeleton directly.
 - React components and styles are still available in `src` if you want to resume the interactive build later.

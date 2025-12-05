@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sofa Tetris | FD Games</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../common.css" />
+  </head>
+  <body>
+    <header>
+      <div class="navbar">
+        <div class="nav-left">
+          <span class="brand">FD Games</span>
+          <span class="pill">Sofa Tetris</span>
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <a class="btn secondary" href="../../index.html">Back to hub</a>
+          <button class="btn outline" data-action="reset">Reset state</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="hero">
+        <div>
+          <p class="badge">Block fitting</p>
+          <h1>Clear lines with furniture silhouettes.</h1>
+          <p>
+            Use this scaffold for your board, fall speed, and rotation controls. Swap default blocks for FD silhouettes and
+            tune speed ramps.
+          </p>
+          <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 1rem;">
+            <button class="btn" data-action="start">Start stack</button>
+            <a class="btn secondary" href="../../start/sofa-tetris/README.md">View brief</a>
+          </div>
+          <div class="status" style="margin-top: 1rem;">
+            <span class="status-indicator"></span>
+            <span data-status>Awaiting board setup.</span>
+          </div>
+        </div>
+        <div class="panel">
+          <h3 class="section-title">Board</h3>
+          <p class="muted">Use this block for your grid, drop logic, and clear animations.</p>
+          <div class="placeholder-area">Tetris board placeholder.</div>
+        </div>
+      </section>
+
+      <section style="margin-top: 1.5rem;" class="subgrid">
+        <div class="panel">
+          <h3 class="section-title">Build checklist</h3>
+          <div class="checklist" style="display: grid; gap: 0.75rem;">
+            <label><input type="checkbox" data-check="board" />Board/grid rendering + collision.</label>
+            <label><input type="checkbox" data-check="speed" />Speed ramp + level tracking.</label>
+            <label><input type="checkbox" data-check="silhouettes" />Replace tetrominos with FD silhouettes.</label>
+          </div>
+        </div>
+        <div class="panel">
+          <h3 class="section-title">Design notes</h3>
+          <ul class="muted" style="line-height: 1.6; padding-left: 1.1rem;">
+            <li>Offer rotate buttons for kiosks + keyboard fallback.</li>
+            <li>Score combos for clearing multiple lines.</li>
+            <li>Daily leaderboard resets for fresh runs.</li>
+          </ul>
+        </div>
+        <div class="panel">
+          <h3 class="section-title">Session notes</h3>
+          <p class="muted">Fast jot for findings or tweaks. Saved locally.</p>
+          <textarea data-note rows="6" style="width: 100%; border-radius: 12px; padding: 0.75rem; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03); color: var(--text);"></textarea>
+        </div>
+      </section>
+
+      <section style="margin-top: 1.5rem;" class="panel">
+        <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;">
+          <div>
+            <h3 class="section-title">Activity log</h3>
+            <p class="muted" style="margin: 0;">Track when you start/reset during testing.</p>
+          </div>
+          <a class="btn secondary" href="../../README.md">Repo notes</a>
+        </div>
+        <ul class="log" data-log style="margin-top: 0.75rem;"></ul>
+      </section>
+    </main>
+
+    <script src="../common.js"></script>
+    <script>
+      initGameSkeleton({ slug: 'sofa-tetris', title: 'Sofa Tetris', defaultStatus: 'Board ready soon.' });
+    </script>
+  </body>
+</html>
