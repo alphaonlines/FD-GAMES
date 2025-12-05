@@ -1,75 +1,28 @@
-# React + TypeScript + Vite
+# FD Games Training Hub
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React + TypeScript + Vite landing experience for the FD Games collection. The root `index.html` hosts a home screen that routes
+into the Furniture Sales Training Game and quick policy references.
 
-Currently, two official plugins are available:
+## Features
+- **Landing page:** Hero messaging with quick-start buttons and feature highlights for the current training experiences.
+- **Furniture Sales Training Game:** Scenario-based multiple choice training with scoring, feedback, and a product catalog modal.
+- **Policy Library:** Accordion-style references for common customer-facing policies.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Getting started
+1. Install dependencies: `npm install`
+2. Run locally: `npm run dev`
+3. Build for production: `npm run build`
 
-## React Compiler
+## Game checklist
+Track progress as we expand the library.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- [x] Landing page entry point in `index.html` and React UI
+- [x] Furniture Sales Training Game prototype with scorekeeping
+- [x] Policy reference view linked from the landing page
+- [ ] Dedicated `start/` folder with per-game assets
+- [ ] Game-specific README files and content briefs
+- [ ] Additional training games and scenarios
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-# FD-GAMES
-# FD-GAMES
+## Project notes
+- The landing view is the default route and uses the top navigation to jump into the existing game and policy views.
+- Styling uses Bootstrap 5 plus light custom theming in `src/App.css`.
