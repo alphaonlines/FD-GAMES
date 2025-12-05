@@ -216,10 +216,12 @@
         const prev = stack[stack.length - 1];
         const variance = Math.random() * 60 - 30;
         const width = Math.max(70, Math.min(220, prev.width + variance));
+        const minX = width / 2;
+        const maxX = canvas.width - width / 2;
         block = {
           width,
           height: 24,
-          x: 80 + Math.random() * (canvas.width - 160),
+          x: minX + Math.random() * (maxX - minX),
           y: 60,
           direction: Math.random() > 0.5 ? 1 : -1,
           speed: 1.6 + stack.length * 0.12,
