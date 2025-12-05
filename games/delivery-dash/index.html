@@ -116,6 +116,10 @@
       let tickId = null;
       let objects = [];
       let rowHeight = 32 + 8;
+      let lastTimestamp = null;
+      let spawnAccumulator = 0;
+      const objectSpeed = (rowHeight * 0.85) * 60; // pixels per second
+      const spawnInterval = 1000 / 27; // approx. matches previous spawn cadence
 
       function buildLanes() {
         lanesContainer.innerHTML = '';
@@ -140,9 +144,19 @@
         objects.push({ lane, y: -rowHeight, type });
       }
 
-      function update() {
+      function update(timestamp) {
+        if (lastTimestamp === null) {
+          lastTimestamp = timestamp;
+          tickId = requestAnimationFrame(update);
+          return;
+        }
+
+        const deltaMs = timestamp - lastTimestamp;
+        const deltaSeconds = deltaMs / 1000;
+        lastTimestamp = timestamp;
+
         objects.forEach((obj) => {
-          obj.y += rowHeight * 0.85;
+          obj.y += objectSpeed * deltaSeconds;
         });
         objects = objects.filter((obj) => obj.y < 360);
 
@@ -160,7 +174,12 @@
           updateHUD();
         }
 
-        if (Math.random() < 0.45) spawn();
+        spawnAccumulator += deltaMs;
+        while (spawnAccumulator >= spawnInterval) {
+          spawn();
+          spawnAccumulator -= spawnInterval;
+        }
+
         render();
 
         if (hearts <= 0) {
@@ -205,6 +224,8 @@
         objects = [];
         score = 0;
         hearts = 3;
+        lastTimestamp = null;
+        spawnAccumulator = 0;
         moveTo(1);
         updateHUD();
         statusEl.textContent = 'Deliveries rolling. Avoid cones, grab stars!';
