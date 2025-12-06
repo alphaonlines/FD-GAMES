@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Couch Catapult | FD Games</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../common.css" />
+    <style>
+      .play-area {
+        background: radial-gradient(circle at 20% 20%, rgba(102, 224, 255, 0.08), transparent 40%),
+          radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.08), transparent 40%),
+          #061325;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 0.75rem;
+      }
+
+      canvas {
+        width: 100%;
+        height: auto;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: linear-gradient(#0b1c36 55%, #0e223f 55%);
+        touch-action: none;
+      }
+
+      .hud {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        margin: 0.75rem 0 0.35rem;
+      }
+
+      .stat {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        border-radius: 12px;
+        padding: 0.65rem 0.75rem;
+        min-width: 120px;
+      }
+
+      .stat span {
+        display: block;
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.65);
+      }
+
+      .stat strong {
+        display: block;
+        font-size: 1.35rem;
+      }
+
+      .controls {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+
+      .pill.note {
+        border-color: rgba(255, 255, 255, 0.12);
+        color: rgba(255, 255, 255, 0.8);
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="navbar">
+        <div class="nav-left">
+          <span class="brand">FD Games</span>
+          <span class="pill">Prototype</span>
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <a class="btn secondary" href="../../index.html">Back to hub</a>
+          <button class="btn outline" data-action="reset">Reset</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="hero">
+        <div>
+          <p class="badge">Load the delivery truck!</p>
+          <h1>Couch Catapult</h1>
+          <p>
+            Pull back, aim, and fling pillows or ottomans into the moving truck. Bank shots off the ramp for bonus points and
+            keep streaks alive for multipliers.
+          </p>
+          <div class="hud">
+            <div class="stat"><span>Score</span><strong data-score>0</strong></div>
+            <div class="stat"><span>Streak bonus</span><strong data-mult>x1</strong></div>
+            <div class="stat"><span>Timer</span><strong data-timer>40s</strong></div>
+            <div class="stat"><span>Next item</span><strong data-item>Pillow</strong></div>
+          </div>
+          <div class="controls" style="margin-top: 0.25rem;">
+            <button class="btn" data-action="start">Start round</button>
+            <button class="btn secondary" data-action="launch">Launch now</button>
+            <a class="btn secondary" href="../../start/couch-catapult/README.md">View brief</a>
+          </div>
+          <p class="muted" style="margin-top: 0.5rem;" data-status>Press start, then drag from the sling to aim.</p>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.65rem;">
+            <span class="pill note">Truck landing +10 • Bank off ramp +15 • Rim graze +3</span>
+            <span class="pill note">Every 3 makes raise the multiplier</span>
+            <span class="pill note">Avoid launching the glass table penalty</span>
+          </div>
+        </div>
+        <div class="panel play-area">
+          <canvas id="playfield" width="960" height="520" aria-label="Couch Catapult playfield"></canvas>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p style="margin: 0;">FD Games</p>
+      <p style="margin: 0;">Simple fake-physics sling with streak scoring and a moving truck target.</p>
+    </footer>
+
+    <script>
+      const canvas = document.getElementById('playfield');
+      const ctx = canvas.getContext('2d');
+      const scoreEl = document.querySelector('[data-score]');
+      const multEl = document.querySelector('[data-mult]');
+      const timerEl = document.querySelector('[data-timer]');
+      const itemEl = document.querySelector('[data-item]');
+      const statusEl = document.querySelector('[data-status]');
+
+      const sling = { x: 140, y: 400, maxPull: 140 };
+      const ramp = { x1: 320, y1: 360, x2: 470, y2: 300 };
+      const truck = { x: 620, y: 230, width: 150, height: 130, vx: 70 };
+      const floorY = 440;
+      const gravity = 1650;
+      const items = [
+        { label: 'Pillow', color: '#66e0ff' },
+        { label: 'Ottoman', color: '#f59e0b' },
+        { label: 'Lamp', color: '#a5b4fc' },
+        { label: 'Glass table', color: '#f472b6', penalty: true },
+      ];
+
+      let projectile = null;
+      let dragging = false;
+      let pointer = { x: sling.x, y: sling.y };
+      let score = 0;
+      let streak = 0;
+      let timeLeft = 40;
+      let roundActive = false;
+      let nextItem = items[0];
+      let lastFrame = null;
+      let raf = null;
+
+      function setStatus(text) {
+        statusEl.textContent = text;
+      }
+
+      function chooseNextItem() {
+        nextItem = items[Math.floor(Math.random() * items.length)];
+        itemEl.textContent = nextItem.label;
+      }
+
+      function resetProjectile() {
+        projectile = {
+          x: sling.x,
+          y: sling.y,
+          vx: 0,
+          vy: 0,
+          radius: 16,
+          state: 'idle',
+          rimAwarded: false,
+          touchedRamp: false,
+          item: nextItem,
+        };
+        chooseNextItem();
+      }
+
+      function updateHUD() {
+        const mult = 1 + Math.floor(Math.max(streak - 1, 0) / 3);
+        scoreEl.textContent = score;
+        multEl.textContent = `x${mult}`;
+        timerEl.textContent = `${Math.max(0, Math.ceil(timeLeft))}s`;
+        itemEl.textContent = nextItem.label;
+      }
+
+      function addScore(base, reason) {
+        streak += 1;
+        const mult = 1 + Math.floor(Math.max(streak - 1, 0) / 3);
+        const gained = base * mult;
+        score += gained;
+        setStatus(`${reason} (+${gained}, ${base} base ×${mult})`);
+        updateHUD();
+      }
+
+      function missShot() {
+        if (projectile) {
+          projectile.state = 'rested';
+          streak = 0;
+          setStatus('Missed the truck. Streak reset.');
+          updateHUD();
+          setTimeout(resetProjectile, 500);
+        }
+      }
+
+      function handleGlassPenalty() {
+        if (projectile.item.penalty) {
+          score = Math.max(0, score - 5);
+          setStatus('Glass table launched: -5 penalty.');
+          streak = 0;
+          updateHUD();
+        }
+      }
+
+      function launchProjectile() {
+        if (!projectile || projectile.state !== 'idle') return;
+        const dx = pointer.x - sling.x;
+        const dy = pointer.y - sling.y;
+        const distance = Math.min(Math.hypot(dx, dy), sling.maxPull);
+        if (distance < 8) return;
+        const angle = Math.atan2(dy, dx);
+        const power = distance * 6.2;
+        projectile.vx = -(Math.cos(angle) * power);
+        projectile.vy = -(Math.sin(angle) * power);
+        projectile.state = 'flying';
+        handleGlassPenalty();
+        setStatus('Launched! Track the arc and target the moving truck.');
+      }
+
+      function moveTruck(delta) {
+        truck.x += truck.vx * delta;
+        if (truck.x < 500 || truck.x + truck.width > canvas.width - 40) {
+          truck.vx *= -1;
+          truck.x = Math.min(Math.max(truck.x, 500), canvas.width - truck.width - 40);
+        }
+      }
+
+      function detectRampCollision(prevY) {
+        if (!projectile || projectile.state !== 'flying') return;
+        const minX = Math.min(ramp.x1, ramp.x2);
+        const maxX = Math.max(ramp.x1, ramp.x2);
+        if (projectile.x < minX || projectile.x > maxX) return;
+
+        const slope = (ramp.y2 - ramp.y1) / (ramp.x2 - ramp.x1);
+        const rampY = ramp.y1 + slope * (projectile.x - ramp.x1);
+        if (projectile.y + projectile.radius >= rampY && prevY + projectile.radius < rampY) {
+          projectile.y = rampY - projectile.radius;
+          projectile.vy = -Math.abs(projectile.vy * 0.6);
+          projectile.vx *= 0.9;
+          projectile.touchedRamp = true;
+          setStatus('Banked off the ramp!');
+        }
+      }
+
+      function detectTruckContact(prevY) {
+        if (!projectile || projectile.state !== 'flying') return;
+        const rimTop = truck.y;
+        const rimBottom = truck.y + 14;
+        const innerLeft = truck.x + 12;
+        const innerRight = truck.x + truck.width - 12;
+        const innerFloor = truck.y + truck.height - 14;
+
+        const withinX = projectile.x >= innerLeft && projectile.x <= innerRight;
+        if (!projectile.rimAwarded && prevY + projectile.radius < rimTop && projectile.y + projectile.radius >= rimTop && withinX) {
+          projectile.rimAwarded = true;
+          projectile.vy = -Math.abs(projectile.vy * 0.35);
+          projectile.vx *= 0.92;
+          addScore(3, 'Rim graze');
+        }
+
+        if (withinX && projectile.y + projectile.radius >= rimBottom && projectile.y + projectile.radius <= innerFloor && projectile.vy > 0) {
+          projectile.y = innerFloor - projectile.radius;
+          projectile.vx = 0;
+          projectile.vy = 0;
+          projectile.state = 'settled';
+          const base = projectile.touchedRamp ? 15 : 10;
+          addScore(base, projectile.touchedRamp ? 'Bank shot landed!' : 'Clean landing!');
+          setTimeout(resetProjectile, 450);
+        }
+      }
+
+      function update(delta) {
+        moveTruck(delta);
+
+        if (projectile) {
+          const prevY = projectile.y;
+          if (projectile.state === 'flying') {
+            projectile.vy += gravity * delta;
+            projectile.x += projectile.vx * delta;
+            projectile.y += projectile.vy * delta;
+
+            detectRampCollision(prevY);
+            detectTruckContact(prevY);
+
+            if (projectile.y + projectile.radius >= floorY) {
+              projectile.y = floorY - projectile.radius;
+              projectile.vy = -Math.abs(projectile.vy * 0.45);
+              projectile.vx *= 0.9;
+              if (Math.abs(projectile.vy) < 40) {
+                missShot();
+              }
+            }
+
+            if (projectile.x > canvas.width + 50 || projectile.y > canvas.height + 50 || projectile.x < -50) {
+              missShot();
+            }
+          }
+        }
+      }
+
+      function drawSling() {
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(sling.x - 18, sling.y);
+        ctx.lineTo(sling.x + 18, sling.y);
+        ctx.stroke();
+
+        if (projectile && projectile.state === 'idle' && dragging) {
+          ctx.strokeStyle = '#66e0ff';
+          ctx.beginPath();
+          ctx.moveTo(sling.x, sling.y);
+          ctx.lineTo(pointer.x, pointer.y);
+          ctx.stroke();
+        }
+      }
+
+      function drawRamp() {
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.moveTo(ramp.x1, ramp.y1);
+        ctx.lineTo(ramp.x2, ramp.y2);
+        ctx.stroke();
+      }
+
+      function drawTruck() {
+        ctx.fillStyle = 'rgba(102, 224, 255, 0.15)';
+        ctx.strokeStyle = 'rgba(102, 224, 255, 0.8)';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.rect(truck.x, truck.y, truck.width, truck.height);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = 'rgba(102, 224, 255, 0.3)';
+        ctx.fillRect(truck.x, truck.y, truck.width, 14);
+      }
+
+      function drawProjectile() {
+        if (!projectile) return;
+        ctx.fillStyle = projectile.item.color;
+        ctx.beginPath();
+        ctx.arc(projectile.x, projectile.y, projectile.radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      function render() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#102544';
+        ctx.fillRect(0, floorY, canvas.width, canvas.height - floorY);
+
+        drawRamp();
+        drawTruck();
+        drawSling();
+        drawProjectile();
+      }
+
+      function tick(timestamp) {
+        if (!lastFrame) lastFrame = timestamp;
+        const delta = (timestamp - lastFrame) / 1000;
+        lastFrame = timestamp;
+
+        if (roundActive) {
+          timeLeft -= delta;
+          if (timeLeft <= 0) {
+            timeLeft = 0;
+            roundActive = false;
+            setStatus('Time is up!');
+          }
+        }
+
+        update(delta);
+        render();
+        updateHUD();
+
+        raf = requestAnimationFrame(tick);
+      }
+
+      function startRound() {
+        score = 0;
+        streak = 0;
+        timeLeft = 40;
+        roundActive = true;
+        lastFrame = null;
+        setStatus('Round started. Drag to aim and release to fling!');
+        resetProjectile();
+      }
+
+      function resetRound() {
+        roundActive = false;
+        score = 0;
+        streak = 0;
+        timeLeft = 40;
+        setStatus('Reset complete. Press start to play.');
+        resetProjectile();
+        updateHUD();
+      }
+
+      canvas.addEventListener('pointerdown', (event) => {
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        const dist = Math.hypot(x - sling.x, y - sling.y);
+        if (!projectile || projectile.state !== 'idle' || dist > 70) return;
+        dragging = true;
+        pointer = { x, y };
+      });
+
+      canvas.addEventListener('pointermove', (event) => {
+        if (!dragging) return;
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        const dx = x - sling.x;
+        const dy = y - sling.y;
+        const distance = Math.min(Math.hypot(dx, dy), sling.maxPull);
+        const angle = Math.atan2(dy, dx);
+        pointer = {
+          x: sling.x + Math.cos(angle) * distance,
+          y: sling.y + Math.sin(angle) * distance,
+        };
+      });
+
+      const release = () => {
+        if (!dragging) return;
+        dragging = false;
+        launchProjectile();
+      };
+
+      canvas.addEventListener('pointerup', release);
+      canvas.addEventListener('pointerleave', release);
+
+      document.querySelector('[data-action="start"]').addEventListener('click', startRound);
+      document.querySelector('[data-action="reset"]').addEventListener('click', resetRound);
+      document.querySelector('[data-action="launch"]').addEventListener('click', launchProjectile);
+
+      resetProjectile();
+      updateHUD();
+      tick();
+    </script>
+  </body>
+</html>
