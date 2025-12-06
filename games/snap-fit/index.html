@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Room Designer — Snap Fit</title>
+    <style>
+      :root {
+        --bg: #060915;
+        --panel: #0f1a34;
+        --tray: #0c1325;
+        --text: #f4f7fb;
+        --muted: #cfd6e5;
+        --accent: #66e0ff;
+        --accent-2: #f9a826;
+      }
+
+      [data-theme='rustic'] {
+        --panel: #20160f;
+        --tray: #18100a;
+        --accent: #d6aa73;
+        --accent-2: #d87a42;
+      }
+
+      [data-theme='coastal'] {
+        --panel: #0f1f2f;
+        --tray: #0d1826;
+        --accent: #6ad7e5;
+        --accent-2: #7fc8a9;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        background: radial-gradient(circle at 18% 18%, rgba(102, 224, 255, 0.1), transparent 30%),
+          radial-gradient(circle at 80% 10%, rgba(249, 168, 38, 0.08), transparent 24%),
+          linear-gradient(145deg, #060915 0%, #0b1429 50%, #060915 100%);
+        color: var(--text);
+        min-height: 100vh;
+      }
+
+      .page {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 1.5rem;
+        display: grid;
+        grid-template-columns: 360px 1fr;
+        gap: 1.25rem;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 0 0.25rem;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .brand {
+        font-weight: 800;
+        letter-spacing: -0.01em;
+      }
+
+      .pill {
+        padding: 0.45rem 0.75rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: var(--muted);
+        font-weight: 600;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 1rem;
+        box-shadow: 0 18px 48px rgba(0, 0, 0, 0.35);
+      }
+
+      .tray {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 0.75rem;
+        background: var(--tray);
+      }
+
+      .item-card {
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        padding: 0.75rem;
+        background: rgba(255, 255, 255, 0.03);
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        cursor: grab;
+        user-select: none;
+      }
+
+      .item-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        border-radius: 8px;
+        padding: 0.25rem 0.45rem;
+        font-weight: 700;
+        color: #031126;
+      }
+
+      .canvas-wrap {
+        display: grid;
+        grid-template-rows: auto 1fr;
+        gap: 0.75rem;
+      }
+
+      .room {
+        position: relative;
+        border-radius: 18px;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.04));
+        border: 1px dashed rgba(255, 255, 255, 0.14);
+        overflow: hidden;
+        min-height: 560px;
+      }
+
+      .zone {
+        position: absolute;
+        border: 2px dashed rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        background: rgba(102, 224, 255, 0.06);
+      }
+
+      .zone.valid {
+        border-color: rgba(102, 224, 255, 0.6);
+        background: rgba(102, 224, 255, 0.12);
+      }
+
+      .floating {
+        position: fixed;
+        pointer-events: none;
+        transform: translate(-50%, -50%);
+        z-index: 20;
+      }
+
+      .placed {
+        position: absolute;
+        border-radius: 10px;
+        color: #031126;
+        font-weight: 700;
+        display: grid;
+        place-items: center;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+      }
+
+      .hud {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+      }
+
+      .stat {
+        padding: 0.65rem 0.9rem;
+        background: rgba(255, 255, 255, 0.04);
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        display: grid;
+        gap: 0.1rem;
+      }
+
+      .stat .label {
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      .stat .value {
+        font-weight: 800;
+        font-size: 1.2rem;
+      }
+
+      .themes {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+      }
+
+      .theme-btn {
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text);
+        border-radius: 10px;
+        padding: 0.45rem 0.75rem;
+        cursor: pointer;
+      }
+
+      .theme-btn.active {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 1px var(--accent);
+      }
+
+      .summary {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(102, 224, 255, 0.35);
+        border-radius: 14px;
+        padding: 1rem;
+      }
+
+      .badge {
+        display: inline-flex;
+        padding: 0.35rem 0.6rem;
+        border-radius: 999px;
+        background: rgba(102, 224, 255, 0.15);
+        color: var(--text);
+        border: 1px solid rgba(102, 224, 255, 0.4);
+        font-weight: 700;
+      }
+
+      .hint {
+        color: var(--muted);
+        margin: 0.25rem 0 0;
+      }
+
+      @media (max-width: 960px) {
+        .page {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body data-theme="modern">
+    <header>
+      <div class="brand">Room Designer — Snap Fit</div>
+      <span class="pill">Goal: Build a Cozy Living Room</span>
+    </header>
+
+    <div class="page">
+      <aside class="panel">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+          <div>
+            <h2 style="margin: 0 0 0.25rem;">Furniture Tray</h2>
+            <p class="hint">Drag items into the room. Get close to the outline to snap and score.</p>
+          </div>
+          <div class="themes" aria-label="Style themes">
+            <button class="theme-btn active" data-theme-btn="modern">Modern</button>
+            <button class="theme-btn" data-theme-btn="rustic">Rustic</button>
+            <button class="theme-btn" data-theme-btn="coastal">Coastal</button>
+          </div>
+        </div>
+        <div class="tray" id="tray"></div>
+      </aside>
+
+      <section class="panel canvas-wrap">
+        <div class="hud">
+          <div class="stat">
+            <span class="label">Score</span>
+            <span class="value" id="score">0</span>
+          </div>
+          <div class="stat">
+            <span class="label">Mistakes</span>
+            <span class="value" id="mistakes">0</span>
+          </div>
+          <div class="stat">
+            <span class="label">Time</span>
+            <span class="value" id="timer">0.0s</span>
+          </div>
+          <div class="stat">
+            <span class="label">Progress</span>
+            <span class="value" id="progress">0 / 4</span>
+          </div>
+        </div>
+        <div class="room" id="room" aria-label="Room canvas"></div>
+        <div class="summary" id="summary" aria-live="polite" style="display: none;"></div>
+      </section>
+    </div>
+
+    <script>
+      const items = [
+        { id: 'sofa', label: 'Sofa', width: 180, height: 70, colors: { modern: '#66e0ff', rustic: '#d6aa73', coastal: '#6ad7e5' } },
+        { id: 'rug', label: 'Rug', width: 220, height: 120, colors: { modern: '#f9a826', rustic: '#d87a42', coastal: '#7fc8a9' } },
+        { id: 'coffee', label: 'Coffee Table', width: 130, height: 60, colors: { modern: '#6ad7e5', rustic: '#c17f4e', coastal: '#a0d9f6' } },
+        { id: 'lamp', label: 'Lamp', width: 60, height: 60, colors: { modern: '#a78bfa', rustic: '#d0b381', coastal: '#c8e6ff' } },
+      ];
+
+      const zones = {
+        rug: { x: 120, y: 200, width: 260, height: 160 },
+        sofa: { x: 160, y: 150, width: 220, height: 80 },
+        coffee: { x: 210, y: 230, width: 140, height: 70 },
+        lamp: { x: 360, y: 180, width: 60, height: 60 },
+      };
+
+      let score = 0;
+      let mistakes = 0;
+      let placed = new Map();
+      let timerId;
+      let startTime;
+      let activeTheme = 'modern';
+      const threshold = 28;
+
+      const tray = document.getElementById('tray');
+      const room = document.getElementById('room');
+      const summary = document.getElementById('summary');
+
+      const scoreEl = document.getElementById('score');
+      const mistakesEl = document.getElementById('mistakes');
+      const timerEl = document.getElementById('timer');
+      const progressEl = document.getElementById('progress');
+
+      function formatTime(ms) {
+        return (ms / 1000).toFixed(1) + 's';
+      }
+
+      function startTimer() {
+        if (timerId) return;
+        startTime = performance.now();
+        timerId = setInterval(() => {
+          timerEl.textContent = formatTime(performance.now() - startTime);
+        }, 100);
+      }
+
+      function stopTimer() {
+        if (!timerId) return;
+        clearInterval(timerId);
+        timerId = null;
+      }
+
+      function renderZones() {
+        Object.entries(zones).forEach(([id, rect]) => {
+          let z = document.querySelector(`[data-zone="${id}"]`);
+          if (!z) {
+            z = document.createElement('div');
+            z.className = 'zone';
+            z.dataset.zone = id;
+            room.appendChild(z);
+          }
+          z.style.left = rect.x + 'px';
+          z.style.top = rect.y + 'px';
+          z.style.width = rect.width + 'px';
+          z.style.height = rect.height + 'px';
+          z.classList.toggle('valid', !placed.has(id));
+        });
+      }
+
+      function updateHud() {
+        scoreEl.textContent = score;
+        mistakesEl.textContent = mistakes;
+        progressEl.textContent = `${placed.size} / ${items.length}`;
+      }
+
+      function showSummary() {
+        stopTimer();
+        const totalTime = startTime ? formatTime(performance.now() - startTime) : '0.0s';
+        const perfect = mistakes === 0;
+        summary.style.display = 'block';
+        summary.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+            <div>
+              <h3 style="margin: 0 0 0.25rem;">Room complete!</h3>
+              <p class="hint" style="margin: 0;">Finished in <strong>${totalTime}</strong> with <strong>${mistakes}</strong> mistake${
+          mistakes === 1 ? '' : 's'
+        }.</p>
+            </div>
+            ${perfect ? '<span class="badge">Showroom Pro</span>' : ''}
+          </div>
+        `;
+      }
+
+      function handleComplete() {
+        if (placed.size === items.length) {
+          score += 25;
+          updateHud();
+          showSummary();
+        }
+      }
+
+      function placeItem(item, x, y) {
+        const zone = zones[item.id];
+        const centerX = zone.x + zone.width / 2;
+        const centerY = zone.y + zone.height / 2;
+        const dx = Math.abs(centerX - x);
+        const dy = Math.abs(centerY - y);
+
+        if (dx <= threshold && dy <= threshold) {
+          const el = document.createElement('div');
+          el.className = 'placed';
+          el.dataset.placed = item.id;
+          el.textContent = item.label;
+          el.style.background = item.colors[activeTheme];
+          el.style.width = item.width + 'px';
+          el.style.height = item.height + 'px';
+          el.style.left = centerX - item.width / 2 + 'px';
+          el.style.top = centerY - item.height / 2 + 'px';
+          room.appendChild(el);
+          placed.set(item.id, true);
+          score += 10;
+          updateHud();
+          renderZones();
+          handleComplete();
+          return true;
+        }
+
+        mistakes += 1;
+        score = Math.max(0, score - 3);
+        updateHud();
+        return false;
+      }
+
+      function createDragCard(item) {
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.draggable = false;
+        card.dataset.id = item.id;
+        card.innerHTML = `
+          <div class="item-chip" style="background: ${item.colors[activeTheme]};">${item.label}</div>
+          <p class="hint" style="margin: 0;">${item.width} x ${item.height}</p>
+        `;
+
+        let floating;
+        function moveFloating(clientX, clientY) {
+          if (!floating) return;
+          floating.style.left = clientX + 'px';
+          floating.style.top = clientY + 'px';
+        }
+
+        function endFloating(e) {
+          if (!floating) return;
+          const rect = room.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          document.body.removeChild(floating);
+          floating = null;
+
+          if (x < 0 || y < 0 || x > rect.width || y > rect.height) {
+            mistakes += 1;
+            score = Math.max(0, score - 3);
+            updateHud();
+            return;
+          }
+
+          const success = placeItem(item, x, y);
+          if (!success) {
+            const zone = zones[item.id];
+            const hint = document.querySelector(`[data-zone="${item.id}"]`);
+            if (hint) {
+              hint.animate(
+                [
+                  { transform: 'scale(1)', opacity: 1 },
+                  { transform: 'scale(1.05)', opacity: 0.8 },
+                  { transform: 'scale(1)', opacity: 1 },
+                ],
+                { duration: 260 }
+              );
+            }
+          }
+        }
+
+        function startDrag(e) {
+          if (placed.has(item.id)) return;
+          startTimer();
+          floating = document.createElement('div');
+          floating.className = 'placed floating';
+          floating.style.width = item.width + 'px';
+          floating.style.height = item.height + 'px';
+          floating.style.background = item.colors[activeTheme];
+          floating.textContent = item.label;
+          document.body.appendChild(floating);
+          moveFloating(e.clientX, e.clientY);
+        }
+
+        card.addEventListener('pointerdown', (e) => {
+          e.preventDefault();
+          startDrag(e);
+          const move = (ev) => moveFloating(ev.clientX, ev.clientY);
+          const up = (ev) => {
+            document.removeEventListener('pointermove', move);
+            document.removeEventListener('pointerup', up);
+            endFloating(ev);
+          };
+          document.addEventListener('pointermove', move);
+          document.addEventListener('pointerup', up);
+        });
+
+        return card;
+      }
+
+      function renderTray() {
+        tray.innerHTML = '';
+        items.forEach((item) => {
+          tray.appendChild(createDragCard(item));
+        });
+      }
+
+      function setTheme(theme) {
+        activeTheme = theme;
+        document.body.setAttribute('data-theme', theme);
+        document.querySelectorAll('.theme-btn').forEach((btn) => btn.classList.toggle('active', btn.dataset.themeBtn === theme));
+        document.querySelectorAll('.placed').forEach((el) => {
+          const id = el.dataset.placed;
+          const item = items.find((i) => i.id === id);
+          if (item) {
+            el.style.background = item.colors[theme];
+          }
+        });
+        renderTray();
+      }
+
+      function reset() {
+        score = 0;
+        mistakes = 0;
+        placed = new Map();
+        startTime = null;
+        stopTimer();
+        timerEl.textContent = '0.0s';
+        summary.style.display = 'none';
+        room.querySelectorAll('.placed').forEach((el) => el.remove());
+        renderZones();
+        updateHud();
+      }
+
+      renderZones();
+      renderTray();
+      updateHud();
+
+      document.querySelectorAll('[data-theme-btn]').forEach((btn) => {
+        btn.addEventListener('click', () => setTheme(btn.dataset.themeBtn));
+      });
+
+      const resetBtn = document.createElement('button');
+      resetBtn.textContent = 'Restart';
+      resetBtn.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+      resetBtn.style.background = 'rgba(255, 255, 255, 0.08)';
+      resetBtn.style.color = 'var(--text)';
+      resetBtn.style.borderRadius = '10px';
+      resetBtn.style.padding = '0.45rem 0.8rem';
+      resetBtn.style.cursor = 'pointer';
+      resetBtn.addEventListener('click', reset);
+      document.querySelector('.hud').appendChild(resetBtn);
+    </script>
+  </body>
+</html>
