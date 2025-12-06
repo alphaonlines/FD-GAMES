@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FD Games | Prototypes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #050914;
+        --panel: #0f1730;
+        --muted: #cfd6e5;
+        --text: #f4f7fb;
+        --accent: #66e0ff;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: linear-gradient(135deg, #050914 0%, #0b1327 55%, #050914 100%);
+        color: var(--text);
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        min-height: 100vh;
+      }
+
+      header {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(5, 9, 20, 0.85);
+        backdrop-filter: blur(10px);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+      }
+
+      .nav {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 1rem 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+      }
+
+      .brand {
+        font-weight: 800;
+        letter-spacing: 0.02em;
+      }
+
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 1.5rem 1.25rem 2.5rem;
+      }
+
+      .header-text {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        margin-bottom: 1.25rem;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 1rem;
+      }
+
+      .card {
+        background: var(--panel);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        padding: 1rem;
+        display: grid;
+        gap: 0.45rem;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+      }
+
+      .card h3 {
+        margin: 0;
+        letter-spacing: -0.01em;
+      }
+
+      .muted {
+        color: var(--muted);
+        margin: 0;
+        line-height: 1.6;
+      }
+
+      .pill {
+        display: inline-flex;
+        padding: 0.35rem 0.6rem;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: var(--muted);
+        font-weight: 700;
+        font-size: 0.85rem;
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      .actions {
+        display: flex;
+        gap: 0.65rem;
+        flex-wrap: wrap;
+        margin-top: 0.5rem;
+      }
+
+      .btn {
+        border: none;
+        border-radius: 10px;
+        padding: 0.55rem 0.95rem;
+        font-weight: 700;
+        cursor: pointer;
+        color: #031126;
+        background: linear-gradient(120deg, #66e0ff, #3b82f6);
+        box-shadow: 0 12px 32px rgba(59, 130, 246, 0.35);
+        text-decoration: none;
+      }
+
+      .btn.secondary {
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--text);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        box-shadow: none;
+      }
+
+      footer {
+        padding: 1.25rem;
+        text-align: center;
+        color: var(--muted);
+        font-size: 0.95rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(5, 9, 21, 0.85);
+        margin-top: 2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="nav">
+        <span class="brand">FD Games</span>
+        <a class="btn secondary" href="../index.html">Back to landing</a>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="header-text">
+        <p class="pill">Games directory</p>
+        <h1 style="margin: 0;">All kiosk-ready prototypes</h1>
+        <p class="muted" style="margin: 0; max-width: 720px;">
+          Open any title directly from this games index. Each page is a standalone HTML prototype with no build step required,
+          and every brief lives in the paired <code>start</code> folder.
+        </p>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+            <h3>Room Designer — Snap Fit</h3>
+            <span class="pill" style="border-color: rgba(102, 224, 255, 0.35); color: #66e0ff;">Prototype</span>
+          </div>
+          <p class="muted">Drag furniture onto the room canvas, snap into zones, and beat the clock without mistakes.</p>
+          <div class="actions">
+            <a class="btn" href="snap-fit/index.html">Play</a>
+            <a class="btn secondary" href="../start/snap-fit/README.md">Readme</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Couch Stack</h3>
+          <p class="muted">Drop traveling couches onto the stack without losing balance. Tight placement trims each block.</p>
+          <div class="actions">
+            <a class="btn secondary" href="couch-stack/index.html">Play</a>
+            <a class="btn secondary" href="../start/couch-stack/README.md">Readme</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Room Rush</h3>
+          <p class="muted">Fill a 4x4 room with the right furniture before the clock expires. Tap cells and beat the best time.</p>
+          <div class="actions">
+            <a class="btn secondary" href="room-rush/index.html">Play</a>
+            <a class="btn secondary" href="../start/room-rush/README.md">Readme</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Find the Deal</h3>
+          <p class="muted">Search a stylized showroom and tap the hidden sale tag. Time your find and compare against your best run.</p>
+          <div class="actions">
+            <a class="btn secondary" href="find-the-deal/index.html">Play</a>
+            <a class="btn secondary" href="../start/find-the-deal/README.md">Readme</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Memory Match: Furniture Edition</h3>
+          <p class="muted">Flip tiles to pair silhouettes and fabrics. Try 4x4 or 6x6 boards with move and time tracking.</p>
+          <div class="actions">
+            <a class="btn secondary" href="memory-match-furniture-edition/index.html">Play</a>
+            <a class="btn secondary" href="../start/memory-match-furniture-edition/README.md">Readme</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Swipe Sort: Bedroom vs Living Room</h3>
+          <p class="muted">Swipe or tap cards into the right category with streak bonuses. Keep the deck going for a high streak.</p>
+          <div class="actions">
+            <a class="btn secondary" href="swipe-sort/index.html">Play</a>
+            <a class="btn secondary" href="../start/swipe-sort/README.md">Readme</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Price Is Right: Furniture Edition</h3>
+          <p class="muted">Guess if each price is higher or lower than the tag. Streaks build score; see real prices after each guess.</p>
+          <div class="actions">
+            <a class="btn secondary" href="price-is-right-furniture-edition/index.html">Play</a>
+            <a class="btn secondary" href="../start/price-is-right-furniture-edition/README.md">Readme</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Delivery Dash</h3>
+          <p class="muted">Three-lane dodger with cones and pickups. Swap lanes to keep your hearts and chase your best score.</p>
+          <div class="actions">
+            <a class="btn secondary" href="delivery-dash/index.html">Play</a>
+            <a class="btn secondary" href="../start/delivery-dash/README.md">Readme</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Rug Runner</h3>
+          <p class="muted">Endless sprint with jumps, décor pickups, and an energy meter to beat before/after distances.</p>
+          <div class="actions">
+            <a class="btn secondary" href="rug-runner/index.html">Play</a>
+            <a class="btn secondary" href="../start/rug-runner/README.md">Readme</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Build-a-Room: Before/After</h3>
+          <p class="muted">Toggle hotspots to apply upgrades and watch the score climb. Hit 100% to finish your after view.</p>
+          <div class="actions">
+            <a class="btn secondary" href="build-a-room/index.html">Play</a>
+            <a class="btn secondary" href="../start/build-a-room/README.md">Readme</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Sofa Tetris</h3>
+          <p class="muted">Line-clearing prototype with falling sofa shapes, scoring, and soft drops. Rotate and stack to stay alive.</p>
+          <div class="actions">
+            <a class="btn secondary" href="sofa-tetris/index.html">Play</a>
+            <a class="btn secondary" href="../start/sofa-tetris/README.md">Readme</a>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <p style="margin: 0;">FD Games</p>
+      <p style="margin: 0;">Quick links to every prototype page and starter brief.</p>
+    </footer>
+  </body>
+</html>
