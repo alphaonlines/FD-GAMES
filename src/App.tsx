@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import Game from './components/Game';
 import Policies from './components/Policies';
 import Landing from './components/Landing';
+import SnapFitGame from './components/SnapFitGame';
 import './App.css';
 
-type View = 'landing' | 'game' | 'policies';
+type View = 'landing' | 'game' | 'snap-fit' | 'policies';
 
 function App() {
   const [activeView, setActiveView] = useState<View>('landing');
@@ -13,6 +14,8 @@ function App() {
     switch (activeView) {
       case 'game':
         return <Game />;
+      case 'snap-fit':
+        return <SnapFitGame />;
       case 'policies':
         return <Policies />;
       default:
@@ -52,6 +55,15 @@ function App() {
               <li className="nav-item">
                 <a className={`nav-link ${activeView === 'game' ? 'active' : ''}`} href="#" onClick={() => setActiveView('game')}>
                   Furniture Game
+                </a>
+              </li>
+              <li className="nav-item">
+                <a
+                  className={`nav-link ${activeView === 'snap-fit' ? 'active' : ''}`}
+                  href="#"
+                  onClick={() => setActiveView('snap-fit')}
+                >
+                  Room Designer
                 </a>
               </li>
               <li className="nav-item">

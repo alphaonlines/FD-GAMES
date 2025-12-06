@@ -1,6 +1,6 @@
 import React from 'react';
 
-type View = 'landing' | 'game' | 'policies';
+type View = 'landing' | 'game' | 'snap-fit' | 'policies';
 
 interface LandingProps {
   onSelectView: (view: View) => void;
@@ -16,6 +16,15 @@ const games = [
     view: 'game' as View,
     duration: '15-20 min',
     focus: ['Customer discovery', 'Objection handling'],
+  },
+  {
+    id: 'snap-fit',
+    title: 'Room Designer — Snap Fit',
+    description: 'Drag and snap furniture into place, beat the timer, and chase the Showroom Pro badge with zero mistakes.',
+    action: 'Open Snap Fit',
+    view: 'snap-fit' as View,
+    duration: '5-10 min',
+    focus: ['Spatial planning', 'Quick accuracy'],
   },
   {
     id: 'policy-library',
