@@ -404,10 +404,18 @@
         updateHUD();
       }
 
-      canvas.addEventListener('pointerdown', (event) => {
+      function toCanvasCoords(event) {
         const rect = canvas.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        return {
+          x: (event.clientX - rect.left) * scaleX,
+          y: (event.clientY - rect.top) * scaleY,
+        };
+      }
+
+      canvas.addEventListener('pointerdown', (event) => {
+        const { x, y } = toCanvasCoords(event);
         const dist = Math.hypot(x - sling.x, y - sling.y);
         if (!projectile || projectile.state !== 'idle' || dist > 70) return;
         dragging = true;
@@ -416,9 +424,7 @@
 
       canvas.addEventListener('pointermove', (event) => {
         if (!dragging) return;
-        const rect = canvas.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
+        const { x, y } = toCanvasCoords(event);
         const dx = x - sling.x;
         const dy = y - sling.y;
         const distance = Math.min(Math.hypot(dx, dy), sling.maxPull);
