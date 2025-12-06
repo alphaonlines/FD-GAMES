@@ -3,54 +3,175 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rug Runner Prototype | FD Games</title>
+    <title>Stacker Prototype | FD Games</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="../common.css" />
     <style>
-      .track {
-        position: relative;
-        height: 220px;
-        border-radius: 14px;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        background: linear-gradient(180deg, rgba(102, 224, 255, 0.08), rgba(255, 255, 255, 0.02));
-        overflow: hidden;
+      :root {
+        --accent: #22c55e;
+        --danger: #ef4444;
+        --muted: rgba(255, 255, 255, 0.7);
       }
 
-      .runner, .obstacle, .pickup {
+      body {
+        background: radial-gradient(circle at 20% 20%, rgba(34, 197, 94, 0.06), transparent 35%),
+          radial-gradient(circle at 80% 0%, rgba(59, 130, 246, 0.08), transparent 45%),
+          #020617;
+      }
+
+      .layout {
+        display: grid;
+        gap: 1rem;
+      }
+
+      .game-shell {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 1rem;
+      }
+
+      @media (max-width: 960px) {
+        .game-shell {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .play-area {
+        position: relative;
+        height: 420px;
+        border-radius: 16px;
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.8));
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+        touch-action: none;
+        cursor: pointer;
+        isolation: isolate;
+      }
+
+      .rail {
         position: absolute;
-        bottom: 22px;
-        width: 46px;
-        height: 46px;
-        border-radius: 12px;
+        inset: 0 0 72px 0;
+        overflow: visible;
+        transform: translateY(0);
+        transition: transform 0.3s ease;
+      }
+
+      .block {
+        position: absolute;
+        height: 36px;
+        border-radius: 10px;
+        color: #031126;
+        font-weight: 700;
         display: grid;
         place-items: center;
-        font-weight: 700;
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.28);
+        border: 1px solid rgba(0, 0, 0, 0.25);
+        transition: background 0.2s ease, transform 0.2s ease;
       }
 
-      .runner {
-        left: 32px;
-        background: linear-gradient(120deg, #66e0ff, #3b82f6);
-        color: #031126;
-        box-shadow: 0 10px 24px rgba(59, 130, 246, 0.35);
+      .block.base {
+        background: linear-gradient(135deg, #22c55e, #16a34a);
+        color: #052e16;
       }
 
-      .obstacle {
-        background: rgba(252, 165, 165, 0.9);
-        color: #320000;
+      .block.furniture {
+        background: linear-gradient(135deg, #60a5fa, #34d399);
       }
 
-      .pickup {
-        background: rgba(34, 197, 94, 0.9);
-        color: #0a1a0f;
+      .block.scrap {
+        background: linear-gradient(135deg, #facc15, #fb7185);
+        animation: fall 0.8s ease forwards;
+        opacity: 0.9;
       }
 
-      .controls {
+      .block.perfect {
+        box-shadow: 0 0 14px rgba(34, 197, 94, 0.65);
+      }
+
+      @keyframes fall {
+        0% {
+          opacity: 0.9;
+          transform: translateY(0);
+        }
+        80% {
+          opacity: 0.7;
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(140px) rotate(6deg);
+        }
+      }
+
+      .ground {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 72px;
+        background: linear-gradient(180deg, rgba(12, 74, 110, 0.45), rgba(8, 47, 73, 0.9));
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .hud {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 0.5rem;
+      }
+
+      .activity-log {
+        max-height: 200px;
+        overflow: auto;
+        padding-left: 1rem;
+        margin-top: 0.35rem;
+      }
+
+      .badge-row {
         display: flex;
-        gap: 0.6rem;
+        gap: 0.4rem;
         flex-wrap: wrap;
-        margin-top: 0.75rem;
+        align-items: center;
+        margin-bottom: 0.4rem;
+      }
+
+      .pill.warn {
+        background: rgba(239, 68, 68, 0.12);
+        color: #fecdd3;
+        border: 1px solid rgba(239, 68, 68, 0.35);
+      }
+
+      .tip-float {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        padding: 0.4rem 0.6rem;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        color: #e2e8f0;
+        font-size: 12px;
+      }
+
+      .attract {
+        position: absolute;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: rgba(2, 6, 23, 0.75);
+        color: #e2e8f0;
+        text-align: center;
+        padding: 1rem;
+        z-index: 10;
+      }
+
+      .attract.active {
+        display: flex;
       }
     </style>
   </head>
@@ -63,173 +184,372 @@
         </div>
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
           <a class="btn secondary" href="../../index.html">Back to hub</a>
-          <button class="btn outline" data-action="reset">Reset run</button>
+          <button class="btn outline" data-action="reset">Reset</button>
         </div>
       </div>
     </header>
 
-    <main class="container">
+    <main class="container layout">
       <section class="hero">
         <div>
-          <p class="badge">Endless sprint</p>
-          <h1>Rug Runner prototype</h1>
-          <p>Leap over crates, snag décor pickups, and stretch your run before the timer drains.</p>
+          <p class="badge">Furniture stacker</p>
+          <h1>Stack the showroom</h1>
+          <p>Time the drop to keep the overlap. Miss by more than 90% and the tower tumbles.</p>
           <div class="hud" style="margin-top: 0.6rem;">
-            <div class="stat"><span>Distance</span><strong data-distance>0m</strong></div>
-            <div class="stat"><span>Energy</span><strong data-energy>100%</strong></div>
-            <div class="stat"><span>Best</span><strong data-best>0m</strong></div>
+            <div class="stat"><span>Height</span><strong data-height>0</strong></div>
+            <div class="stat"><span>Best</span><strong data-best>0</strong></div>
+            <div class="stat"><span>Last overlap</span><strong data-overlap>–</strong></div>
           </div>
-          <div class="controls">
-            <button class="btn" data-action="start">Start sprint</button>
-            <button class="btn secondary" data-action="jump">Jump</button>
-            <a class="btn secondary" href="../../start/rug-runner/README.md">View brief</a>
+          <div class="controls" style="margin-top: 0.8rem; gap: 0.5rem; flex-wrap: wrap;">
+            <button class="btn" data-action="drop">Drop piece</button>
+            <button class="btn secondary" data-action="start">Start run</button>
+            <button class="btn outline" data-action="hub">Back to hub</button>
+            <span class="muted">Tap the play area or press space/enter to drop.</span>
           </div>
-          <p class="muted" style="margin-top: 0.5rem;" data-status>Tap jump or press space to clear obstacles.</p>
         </div>
         <div class="panel">
-          <h3 class="section-title">Track</h3>
-          <div class="track" id="track"></div>
+          <div class="card-body">
+            <h3 class="section-title">Status</h3>
+            <p class="muted" data-status>Idle — tap start to begin.</p>
+            <div class="badge-row">
+              <span class="pill" data-speed>Pace 1 · 60px/s</span>
+              <span class="pill" data-perfect>Perfect streak: 0</span>
+              <span class="pill warn" data-warning style="display: none;">Game over</span>
+            </div>
+            <p class="muted" style="margin-top: 0.35rem;">Theme: couches, loveseats, ottomans, mattresses, dressers.</p>
+            <div>
+              <p class="muted" style="margin: 0.5rem 0 0.1rem; font-weight: 600;">Activity log</p>
+              <ul class="muted activity-log" data-log></ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="game-shell">
+        <div class="play-area" id="play-area">
+          <div class="tip-float">Tap anywhere to drop the moving furniture.</div>
+          <div class="rail" data-rail></div>
+          <div class="ground"></div>
+          <div class="attract" data-attract>
+            <div>
+              <p class="badge">Attract mode</p>
+              <h3>Tap to start stacking</h3>
+              <p class="muted">The game will auto-drop pieces to demo if idle for 30s.</p>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="card-body">
+            <p class="badge">How to play</p>
+            <ul style="margin: 0.4rem 0 0 1rem;">
+              <li>Drop the moving piece so it overlaps the one below.</li>
+              <li>Less than 10% overlap ends the run. Perfect fits glow.</li>
+              <li>Speed ramps every 5 layers. Try to beat your best height.</li>
+              <li>Touch anywhere on the play area to drop — kiosk friendly.</li>
+            </ul>
+          </div>
         </div>
       </section>
     </main>
 
     <script>
-      const track = document.getElementById('track');
+      const playArea = document.getElementById('play-area');
+      const rail = document.querySelector('[data-rail]');
       const statusEl = document.querySelector('[data-status]');
-      const distanceEl = document.querySelector('[data-distance]');
-      const energyEl = document.querySelector('[data-energy]');
+      const speedEl = document.querySelector('[data-speed]');
+      const perfectEl = document.querySelector('[data-perfect]');
+      const warningEl = document.querySelector('[data-warning]');
+      const heightEl = document.querySelector('[data-height]');
       const bestEl = document.querySelector('[data-best]');
+      const overlapEl = document.querySelector('[data-overlap]');
+      const logEl = document.querySelector('[data-log]');
+      const attractEl = document.querySelector('[data-attract]');
 
-      let runnerEl = null;
-      let runnerY = 0;
-      let velocity = 0;
-      let gravity = -0.5;
-      let isRunning = false;
-      let distance = 0;
-      let energy = 100;
-      let best = Number(localStorage.getItem('fd-rug-best') || 0);
-      let objects = [];
-      let tickId = null;
+      const furnitureNames = ['Couch', 'Loveseat', 'Ottoman', 'Mattress', 'Dresser'];
+      const areaWidth = 320;
+      const blockHeight = 36;
+      const startSpeed = 60; // px per second
+      const speedStep = 8;
+      const perfectSnap = 6;
+      const minOverlapRatio = 0.1;
+      const attractDelay = 30000;
 
-      function renderRunner() {
-        if (!runnerEl) {
-          runnerEl = document.createElement('div');
-          runnerEl.className = 'runner';
-          runnerEl.textContent = '🏃‍♂️';
-          track.appendChild(runnerEl);
-        }
-        runnerEl.style.bottom = `${22 + runnerY}px`;
-      }
+      let stack = [];
+      let current = null;
+      let direction = 1;
+      let speed = startSpeed;
+      let height = 0;
+      let best = Number(localStorage.getItem('fd-stacker-best') || 0);
+      let perfectStreak = 0;
+      let lastTime = 0;
+      let gameState = 'idle'; // idle, running, dropping, gameover
+      let idleTimer = null;
+      let demoTimer = null;
 
-      function spawn() {
-        const type = Math.random() < 0.7 ? 'obstacle' : 'pickup';
-        const item = document.createElement('div');
-        item.className = type;
-        item.classList.add(type === 'obstacle' ? 'obstacle' : 'pickup');
-        item.style.left = '100%';
-        item.style.bottom = type === 'pickup' ? '82px' : '22px';
-        item.textContent = type === 'pickup' ? '+10' : 'Crate';
-        track.appendChild(item);
-        objects.push({ el: item, type });
-      }
-
-      function updateHUD() {
-        distanceEl.textContent = `${distance.toFixed(1)}m`;
-        energyEl.textContent = `${energy.toFixed(0)}%`;
-        bestEl.textContent = `${best.toFixed(1)}m`;
-      }
-
-      function jump() {
-        if (!isRunning) return;
-        if (runnerY > 0) return;
-        velocity = 9;
-        statusEl.textContent = 'Jump!';
-      }
-
-      function reset() {
-        objects.forEach((o) => o.el.remove());
-        objects = [];
-        runnerY = 0;
-        velocity = 0;
-        distance = 0;
-        energy = 100;
-        isRunning = false;
-        statusEl.textContent = 'Reset. Start sprint to run again.';
-        updateHUD();
-        renderRunner();
-        if (tickId) cancelAnimationFrame(tickId);
-        tickId = null;
-      }
-
-      function start() {
-        reset();
-        isRunning = true;
-        statusEl.textContent = 'Sprint live!';
-        loop();
-      }
-
-      function loop() {
-        if (!isRunning) return;
-        velocity += gravity;
-        runnerY = Math.max(0, runnerY + velocity);
-        if (runnerY === 0) velocity = 0;
-        renderRunner();
-        distance += 0.3;
-        energy = Math.max(0, energy - 0.05);
-        if (Math.random() < 0.04) spawn();
-
-        const runnerBox = runnerEl.getBoundingClientRect();
-
-        objects.forEach((obj) => {
-          const left = (parseFloat(obj.el.style.left) || 100) - 1.8;
-          obj.el.style.left = `${left}%`;
-        });
-        objects = objects.filter((obj) => {
-          const left = parseFloat(obj.el.style.left);
-          if (left < -10) {
-            obj.el.remove();
-            return false;
-          }
-          const objBox = obj.el.getBoundingClientRect();
-          const collides = runnerBox.left < objBox.right && runnerBox.right > objBox.left && runnerBox.top < objBox.bottom && runnerBox.bottom > objBox.top;
-          if (collides) {
-            if (obj.type === 'pickup') {
-              distance += 3;
-              energy = Math.min(100, energy + 8);
-              statusEl.textContent = 'Decor snagged!';
-            } else {
-              energy -= 15;
-              statusEl.textContent = 'Ouch! Crate collision.';
-            }
-            obj.el.remove();
-            return false;
-          }
-          return true;
-        });
-
-        if (energy <= 0) {
-          isRunning = false;
-          best = Math.max(best, distance);
-          localStorage.setItem('fd-rug-best', best);
-          statusEl.textContent = 'Energy out. Reset to sprint again.';
-        }
-
-        updateHUD();
-        tickId = requestAnimationFrame(loop);
-      }
-
-      document.querySelector('[data-action="start"]').addEventListener('click', start);
-      document.querySelector('[data-action="jump"]').addEventListener('click', jump);
-      document.querySelector('[data-action="reset"]').addEventListener('click', reset);
-      document.addEventListener('keydown', (e) => {
-        if (e.code === 'Space') {
-          e.preventDefault();
-          jump();
-        }
+      const sounds = {
+        thunk: new Audio('https://assets.mixkit.co/active_storage/sfx/2104/2104-preview.mp3'),
+        chime: new Audio('https://assets.mixkit.co/active_storage/sfx/2851/2851-preview.mp3'),
+      };
+      Object.values(sounds).forEach((audio) => {
+        audio.volume = 0.35;
       });
 
-      renderRunner();
-      updateHUD();
+      function log(message) {
+        const li = document.createElement('li');
+        const now = new Date();
+        li.textContent = `${now.toLocaleTimeString()} — ${message}`;
+        logEl.prepend(li);
+        while (logEl.children.length > 8) {
+          logEl.lastChild.remove();
+        }
+      }
+
+      function resetState() {
+        stack = [];
+        current = null;
+        direction = 1;
+        speed = startSpeed;
+        height = 0;
+        perfectStreak = 0;
+        gameState = 'idle';
+        lastTime = 0;
+        rail.innerHTML = '';
+        warningEl.style.display = 'none';
+        perfectEl.textContent = 'Perfect streak: 0';
+        overlapEl.textContent = '–';
+        updateBadges();
+      }
+
+      function placeBase() {
+        const baseWidth = 200;
+        const x = (areaWidth - baseWidth) / 2;
+        const block = makeBlock(x, blockHeight / 2, baseWidth, 'Base', true);
+        stack.push({ x, width: baseWidth, y: blockHeight / 2, el: block });
+        rail.appendChild(block);
+        height = 1;
+        updateHeight();
+      }
+
+      function makeBlock(x, centerY, width, label, isBase = false) {
+        const block = document.createElement('div');
+        block.className = `block ${isBase ? 'base' : 'furniture'}`;
+        block.style.width = `${width}px`;
+        block.style.left = `${x}px`;
+        block.style.bottom = `${centerY - blockHeight / 2}px`;
+        block.textContent = label;
+        return block;
+      }
+
+      function spawnPiece() {
+        const prev = stack[stack.length - 1];
+        const name = furnitureNames[(stack.length - 1) % furnitureNames.length];
+        const widthDelta = Math.random() * 10 - 5;
+        const width = Math.max(60, Math.min(220, prev.width + widthDelta));
+        const startX = Math.random() > 0.5 ? 12 : areaWidth - width - 12;
+        direction = startX < areaWidth / 2 ? 1 : -1;
+        const y = prev.y + blockHeight;
+        current = { x: startX, y, width, el: makeBlock(startX, y, width, name) };
+        rail.appendChild(current.el);
+        gameState = 'running';
+        statusEl.textContent = `${name} sliding — tap to drop`;
+        log(`New ${name} ready.`);
+        updateSpeedLabel();
+      }
+
+      function updateHeight() {
+        heightEl.textContent = height;
+        best = Math.max(best, height);
+        bestEl.textContent = best;
+        localStorage.setItem('fd-stacker-best', String(best));
+        const lift = Math.max(0, (height - 8) * (blockHeight / 2));
+        rail.style.transform = `translateY(${lift}px)`;
+      }
+
+      function updateBadges() {
+        perfectEl.textContent = `Perfect streak: ${perfectStreak}`;
+        updateSpeedLabel();
+      }
+
+      function updateSpeedLabel() {
+        const tier = Math.floor((height - 1) / 5) + 1;
+        speedEl.textContent = `Pace ${Math.max(1, tier)} · ${speed.toFixed(0)}px/s`;
+      }
+
+      function startGame() {
+        resetState();
+        placeBase();
+        spawnPiece();
+        warningEl.style.display = 'none';
+        height = stack.length;
+        updateHeight();
+        statusEl.textContent = 'Stacking — time your drop!';
+        log('Run started.');
+        lastTime = performance.now();
+        requestAnimationFrame(tick);
+        attractEl.classList.remove('active');
+        clearIdle();
+      }
+
+      function tick(timestamp) {
+        if (gameState === 'gameover' || !current) return;
+        const delta = (timestamp - lastTime) / 1000;
+        lastTime = timestamp;
+
+        if (gameState === 'running') {
+          current.x += direction * speed * delta;
+          if (current.x <= 8) {
+            current.x = 8;
+            direction = 1;
+          }
+          if (current.x + current.width >= areaWidth - 8) {
+            current.x = areaWidth - current.width - 8;
+            direction = -1;
+          }
+          current.el.style.left = `${current.x}px`;
+        }
+
+        requestAnimationFrame(tick);
+      }
+
+      function dropPiece(auto = false) {
+        if (!current || gameState !== 'running') return;
+        gameState = 'dropping';
+        clearIdle();
+        const prev = stack[stack.length - 1];
+        const overlapLeft = Math.max(prev.x, current.x);
+        const overlapRight = Math.min(prev.x + prev.width, current.x + current.width);
+        const overlapWidth = overlapRight - overlapLeft;
+        const overlapRatio = overlapWidth / prev.width;
+
+        if (overlapWidth <= 0 || overlapRatio < minOverlapRatio) {
+          warningEl.style.display = 'inline-block';
+          statusEl.textContent = 'Game over — too little overlap!';
+          log('Game over.');
+          gameState = 'gameover';
+          overlapEl.textContent = '0%';
+          return;
+        }
+
+        const trimmedLeft = overlapLeft !== current.x;
+        const trimmedRight = overlapRight !== current.x + current.width;
+        if (trimmedLeft || trimmedRight) {
+          makeScrap(trimmedLeft ? current.x : overlapRight, current.y, Math.abs(current.x - overlapLeft));
+          makeScrap(trimmedRight ? overlapRight : current.x, current.y, Math.abs(overlapRight - (current.x + current.width)));
+        }
+
+        current.x = overlapLeft;
+        current.width = overlapWidth;
+        current.el.style.left = `${current.x}px`;
+        current.el.style.width = `${overlapWidth}px`;
+        current.el.style.bottom = `${current.y - blockHeight / 2}px`;
+
+        const name = current.el.textContent || 'Piece';
+        const overlapPct = Math.round((overlapWidth / prev.width) * 100);
+        overlapEl.textContent = `${overlapPct}%`;
+        statusEl.textContent = `Dropped ${name}: ${overlapPct}% overlap.`;
+        log(`Dropped ${name}: ${overlapPct}% overlap.`);
+
+        const perfect = Math.abs(current.x - prev.x) < perfectSnap;
+        if (perfect) {
+          current.el.classList.add('perfect');
+          perfectStreak += 1;
+          sounds.chime.play().catch(() => {});
+          statusEl.textContent = `Perfect fit! (${perfectStreak}x)`;
+          log('Perfect fit!');
+        } else {
+          perfectStreak = 0;
+        }
+
+        sounds.thunk.play().catch(() => {});
+
+        stack.push({ x: current.x, width: current.width, y: current.y, el: current.el });
+        height = stack.length;
+        updateHeight();
+        updateBadges();
+        adjustSpeed();
+        current = null;
+        spawnPiece();
+        gameState = 'running';
+        if (auto) scheduleIdle();
+      }
+
+      function adjustSpeed() {
+        const tier = Math.floor((height - 1) / 5);
+        speed = startSpeed + tier * speedStep;
+      }
+
+      function makeScrap(x, y, width) {
+        if (width <= 2) return;
+        const scrap = document.createElement('div');
+        scrap.className = 'block scrap';
+        scrap.style.width = `${width}px`;
+        scrap.style.left = `${x}px`;
+        scrap.style.bottom = `${y - blockHeight / 2}px`;
+        rail.appendChild(scrap);
+        setTimeout(() => scrap.remove(), 900);
+      }
+
+      function clearIdle() {
+        clearTimeout(idleTimer);
+        clearTimeout(demoTimer);
+      }
+
+      function scheduleIdle() {
+        clearIdle();
+        idleTimer = setTimeout(() => {
+          attractEl.classList.add('active');
+          demoTimer = setTimeout(runDemo, 2000);
+        }, attractDelay);
+      }
+
+      function runDemo() {
+        if (gameState === 'gameover') return;
+        if (gameState === 'idle') startGame();
+        if (current && gameState === 'running') {
+          // Drop when roughly centered for a forgiving demo.
+          if (Math.abs(current.x - (areaWidth - current.width) / 2) < 8) {
+            dropPiece(true);
+          } else {
+            requestAnimationFrame(runDemo);
+          }
+        }
+      }
+
+      function preventScroll(event) {
+        event.preventDefault();
+      }
+
+      function bindControls() {
+        document.querySelector('[data-action="start"]').addEventListener('click', startGame);
+        document.querySelector('[data-action="drop"]').addEventListener('click', () => dropPiece());
+        document.querySelector('[data-action="reset"]').addEventListener('click', startGame);
+        document.querySelector('[data-action="hub"]').addEventListener('click', () => {
+          window.location.href = '../../index.html';
+        });
+        playArea.addEventListener('pointerdown', () => {
+          dropPiece();
+        });
+        ['touchmove', 'gesturestart'].forEach((evt) => {
+          playArea.addEventListener(evt, preventScroll, { passive: false });
+        });
+        window.addEventListener('keydown', (e) => {
+          if (e.code === 'Space' || e.code === 'Enter') {
+            e.preventDefault();
+            dropPiece();
+          }
+        });
+      }
+
+      function init() {
+        bestEl.textContent = best;
+        bindControls();
+        resetState();
+        placeBase();
+        statusEl.textContent = 'Idle — tap start to begin.';
+        scheduleIdle();
+      }
+
+      init();
     </script>
   </body>
 </html>
