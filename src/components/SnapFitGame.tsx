@@ -119,6 +119,12 @@ const SnapFitGame: React.FC = () => {
     const x = ((clientX - rect.left) / rect.width) * 100;
     const y = ((clientY - rect.top) / rect.height) * 100;
 
+    const snapThreshold = 18; // percent distance threshold
+
+    const pointInsideZone = zones.find(
+      (zone) => x >= zone.x && x <= zone.x + zone.width && y >= zone.y && y <= zone.y + zone.height,
+    );
+
     const sortedZones = zones
       .map((zone) => {
         const centerX = zone.x + zone.width / 2;
@@ -128,17 +134,15 @@ const SnapFitGame: React.FC = () => {
       })
       .sort((a, b) => a.distance - b.distance);
 
-    const bestMatch = sortedZones[0];
-    const snapThreshold = 22; // percent distance threshold
+    const fallbackZone = sortedZones[0];
+    const zone = pointInsideZone ?? fallbackZone?.zone;
 
-    if (!bestMatch || bestMatch.distance > snapThreshold) {
+    if (!zone || (!pointInsideZone && fallbackZone && fallbackZone.distance > snapThreshold)) {
       setMistakes((prev) => prev + 1);
       setScore((prev) => Math.max(0, prev - 4));
-      setMessage('Out of bounds. Try dropping closer to a highlighted zone.');
+      setMessage('Out of bounds. Drop directly on a highlighted zone to place furniture.');
       return;
     }
-
-    const { zone } = bestMatch;
 
     if (zone.accepts !== item.id) {
       setMistakes((prev) => prev + 1);
