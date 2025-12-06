@@ -3,250 +3,175 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rug Runner Prototype | FD Games</title>
+    <title>Stacker Prototype | FD Games</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="../common.css" />
     <style>
-      .track {
+      :root {
+        --accent: #22c55e;
+        --danger: #ef4444;
+        --muted: rgba(255, 255, 255, 0.7);
+      }
+
+      body {
+        background: radial-gradient(circle at 20% 20%, rgba(34, 197, 94, 0.06), transparent 35%),
+          radial-gradient(circle at 80% 0%, rgba(59, 130, 246, 0.08), transparent 45%),
+          #020617;
+      }
+
+      .layout {
+        display: grid;
+        gap: 1rem;
+      }
+
+      .game-shell {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 1rem;
+      }
+
+      @media (max-width: 960px) {
+        .game-shell {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .play-area {
         position: relative;
-        height: 240px;
-        border-radius: 14px;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        background: linear-gradient(180deg, rgba(102, 224, 255, 0.08), rgba(255, 255, 255, 0.02));
+        height: 420px;
+        border-radius: 16px;
+        background: linear-gradient(180deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.8));
         overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+        touch-action: none;
+        cursor: pointer;
         isolation: isolate;
       }
 
-      .runner,
-      .obstacle,
-      .pickup,
-      .tip,
-      .warning {
+      .rail {
         position: absolute;
-        bottom: 22px;
-        width: 46px;
-        height: 46px;
-        border-radius: 12px;
+        inset: 0 0 72px 0;
+        overflow: visible;
+        transform: translateY(0);
+        transition: transform 0.3s ease;
+      }
+
+      .block {
+        position: absolute;
+        height: 36px;
+        border-radius: 10px;
+        color: #031126;
+        font-weight: 700;
         display: grid;
         place-items: center;
-        font-weight: 700;
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.28);
+        border: 1px solid rgba(0, 0, 0, 0.25);
+        transition: background 0.2s ease, transform 0.2s ease;
       }
 
-      .runner {
-        left: 32px;
-        background: linear-gradient(120deg, #66e0ff, #3b82f6);
-        color: #031126;
-        box-shadow: 0 10px 24px rgba(59, 130, 246, 0.35);
-        transition: transform 0.12s ease, height 0.12s ease, bottom 0.12s ease;
+      .block.base {
+        background: linear-gradient(135deg, #22c55e, #16a34a);
+        color: #052e16;
       }
 
-      .runner.jump {
-        transform: translateY(4px) scale(1.04);
+      .block.furniture {
+        background: linear-gradient(135deg, #60a5fa, #34d399);
       }
 
-      .runner.slide {
-        height: 28px;
-        bottom: 12px;
-        border-radius: 14px;
+      .block.scrap {
+        background: linear-gradient(135deg, #facc15, #fb7185);
+        animation: fall 0.8s ease forwards;
+        opacity: 0.9;
       }
 
-      .runner.hit {
-        animation: shake 0.35s;
+      .block.perfect {
+        box-shadow: 0 0 14px rgba(34, 197, 94, 0.65);
       }
 
-      .track.shake {
-        animation: shakeTrack 0.45s;
-      }
-
-      @keyframes shake {
-        10%,
-        90% {
-          transform: translateX(-2px);
-        }
-        20%,
-        80% {
-          transform: translateX(4px);
-        }
-        30%,
-        50%,
-        70% {
-          transform: translateX(-6px);
-        }
-        40%,
-        60% {
-          transform: translateX(6px);
-        }
-      }
-
-      @keyframes shakeTrack {
-        0%,
-        100% {
-          transform: translateX(0);
-        }
-        20% {
-          transform: translateX(-4px);
-        }
-        40% {
-          transform: translateX(4px);
-        }
-        60% {
-          transform: translateX(-3px);
-        }
-        80% {
-          transform: translateX(3px);
-        }
-      }
-
-      .obstacle {
-        background: rgba(252, 165, 165, 0.9);
-        color: #320000;
-      }
-
-      .pickup {
-        background: rgba(34, 197, 94, 0.9);
-        color: #0a1a0f;
-      }
-
-      .warning {
-        background: rgba(250, 204, 21, 0.22);
-        color: #facc15;
-        width: auto;
-        padding: 0.2rem 0.5rem;
-        border-radius: 999px;
-        border: 1px dashed rgba(250, 204, 21, 0.5);
-        right: 12px;
-        top: 12px;
-        bottom: auto;
-        animation: blink 0.7s ease-in-out infinite;
-      }
-
-      @keyframes blink {
-        0%,
-        100% {
-          opacity: 0.8;
-          transform: translateX(0);
-        }
-        50% {
-          opacity: 0.3;
-          transform: translateX(-3px);
-        }
-      }
-
-      .tip {
-        background: rgba(255, 255, 255, 0.12);
-        color: #e8f1ff;
-        font-size: 12px;
-        width: auto;
-        min-width: 160px;
-        padding: 0.35rem 0.65rem;
-        height: auto;
-        bottom: auto;
-        top: 16px;
-        right: 16px;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-      }
-
-      .controls {
-        display: flex;
-        gap: 0.6rem;
-        flex-wrap: wrap;
-        margin-top: 0.75rem;
-        align-items: center;
-      }
-
-      .hud-progress {
-        width: 100%;
-        height: 8px;
-        background: rgba(255, 255, 255, 0.08);
-        border-radius: 6px;
-        overflow: hidden;
-      }
-
-      .hud-progress span {
-        display: block;
-        height: 100%;
-        background: linear-gradient(90deg, #22c55e, #3b82f6);
-        width: 100%;
-        transition: width 0.18s ease, filter 0.2s ease;
-      }
-
-      .hud-progress span.low {
-        animation: pulse 0.9s ease-in-out infinite;
-        filter: drop-shadow(0 0 6px rgba(248, 113, 113, 0.7));
-      }
-
-      @keyframes pulse {
+      @keyframes fall {
         0% {
+          opacity: 0.9;
+          transform: translateY(0);
+        }
+        80% {
           opacity: 0.7;
         }
-        50% {
-          opacity: 0.3;
-        }
         100% {
-          opacity: 1;
+          opacity: 0;
+          transform: translateY(140px) rotate(6deg);
         }
       }
 
-      .pill.small {
-        padding: 0.2rem 0.5rem;
-        font-size: 12px;
+      .ground {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 72px;
+        background: linear-gradient(180deg, rgba(12, 74, 110, 0.45), rgba(8, 47, 73, 0.9));
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .hud {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 0.5rem;
+      }
+
+      .activity-log {
+        max-height: 200px;
+        overflow: auto;
+        padding-left: 1rem;
+        margin-top: 0.35rem;
+      }
+
+      .badge-row {
+        display: flex;
+        gap: 0.4rem;
+        flex-wrap: wrap;
+        align-items: center;
+        margin-bottom: 0.4rem;
       }
 
       .pill.warn {
-        background: rgba(248, 113, 113, 0.14);
+        background: rgba(239, 68, 68, 0.12);
         color: #fecdd3;
-        border: 1px solid rgba(248, 113, 113, 0.45);
+        border: 1px solid rgba(239, 68, 68, 0.35);
       }
 
-      .hotkey-hint {
-        color: rgba(255, 255, 255, 0.7);
+      .tip-float {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        padding: 0.4rem 0.6rem;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        color: #e2e8f0;
         font-size: 12px;
       }
 
-      .overlay,
-      .summary {
-        position: fixed;
+      .attract {
+        position: absolute;
         inset: 0;
         display: none;
         align-items: center;
         justify-content: center;
         background: rgba(2, 6, 23, 0.75);
-        backdrop-filter: blur(4px);
-        z-index: 20;
+        color: #e2e8f0;
+        text-align: center;
         padding: 1rem;
+        z-index: 10;
       }
 
-      .overlay.active,
-      .summary.active {
+      .attract.active {
         display: flex;
-      }
-
-      .card.solid {
-        background: linear-gradient(160deg, rgba(14, 165, 233, 0.12), rgba(15, 118, 110, 0.12));
-        border: 1px solid rgba(255, 255, 255, 0.06);
-      }
-
-      .track-buttons {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-        gap: 0.4rem;
-      }
-
-      .combo-badge {
-        background: rgba(34, 197, 94, 0.12);
-        color: #4ade80;
-        border: 1px solid rgba(74, 222, 128, 0.24);
-      }
-
-      .missions li {
-        list-style: disc;
-        color: #dbeafe;
-      }
-
-      .missions small {
-        color: rgba(255, 255, 255, 0.7);
       }
     </style>
   </head>
@@ -259,57 +184,70 @@
         </div>
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
           <a class="btn secondary" href="../../index.html">Back to hub</a>
-          <button class="btn outline" data-action="reset">Reset run</button>
+          <button class="btn outline" data-action="reset">Reset</button>
         </div>
       </div>
     </header>
 
-    <main class="container">
+    <main class="container layout">
       <section class="hero">
         <div>
-          <p class="badge">Endless sprint</p>
-          <h1>Rug Runner prototype</h1>
-          <p>Leap over crates, snag décor pickups, and stretch your run before the timer drains.</p>
+          <p class="badge">Furniture stacker</p>
+          <h1>Stack the showroom</h1>
+          <p>Time the drop to keep the overlap. Miss by more than 90% and the tower tumbles.</p>
           <div class="hud" style="margin-top: 0.6rem;">
-            <div class="stat"><span>Distance</span><strong data-distance>0m</strong></div>
-            <div class="stat"><span>Energy</span><strong data-energy>100%</strong></div>
-            <div class="stat"><span>Best</span><strong data-best>0m</strong></div>
+            <div class="stat"><span>Height</span><strong data-height>0</strong></div>
+            <div class="stat"><span>Best</span><strong data-best>0</strong></div>
+            <div class="stat"><span>Last overlap</span><strong data-overlap>–</strong></div>
           </div>
-          <div class="controls">
-            <button class="btn" data-action="start">Start sprint</button>
-            <button class="btn secondary" data-action="jump">Jump</button>
-            <a class="btn secondary" href="../../start/rug-runner/README.md">View brief</a>
+          <div class="controls" style="margin-top: 0.8rem; gap: 0.5rem; flex-wrap: wrap;">
+            <button class="btn" data-action="drop">Drop piece</button>
+            <button class="btn secondary" data-action="start">Start run</button>
+            <button class="btn outline" data-action="hub">Back to hub</button>
+            <span class="muted">Tap the play area or press space/enter to drop.</span>
           </div>
-          <p class="muted" style="margin-top: 0.5rem;" data-status>Tap jump or press space to clear obstacles.</p>
         </div>
         <div class="panel">
-          <h3 class="section-title">Track</h3>
-          <div class="track" id="track">
-            <div class="tip" data-tip>Stay low to slide under crates. Arrow/W = jump, ArrowDown/S = slide.</div>
-            <div class="warning" data-warning style="display: none;">Incoming!</div>
-            <div style="position: absolute; top: 12px; left: 12px; display: flex; gap: 0.4rem; flex-wrap: wrap;">
-              <span class="pill small" data-pace>Pace 1</span>
-              <span class="pill small" data-speed>Speed x1.00</span>
-              <span class="pill small combo-badge" data-combo>Combo 0x</span>
-              <span class="pill small" data-buff style="display: none;">Buff ready</span>
+          <div class="card-body">
+            <h3 class="section-title">Status</h3>
+            <p class="muted" data-status>Idle — tap start to begin.</p>
+            <div class="badge-row">
+              <span class="pill" data-speed>Pace 1 · 60px/s</span>
+              <span class="pill" data-perfect>Perfect streak: 0</span>
+              <span class="pill warn" data-warning style="display: none;">Game over</span>
             </div>
-          </div>
-          <div class="controls" style="margin-top: 0.75rem;">
-            <div class="track-buttons">
-              <button class="btn" data-action="jump">Jump (Space/W/↑)</button>
-              <button class="btn secondary" data-action="slide">Slide (S/↓)</button>
+            <p class="muted" style="margin-top: 0.35rem;">Theme: couches, loveseats, ottomans, mattresses, dressers.</p>
+            <div>
+              <p class="muted" style="margin: 0.5rem 0 0.1rem; font-weight: 600;">Activity log</p>
+              <ul class="muted activity-log" data-log></ul>
             </div>
-            <span class="hotkey-hint">Tip: double-jump once mid-air for an extra lift.</span>
           </div>
         </div>
       </section>
-      <section class="panel" style="margin-top: 1rem;">
-        <div class="card-body">
-          <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
-            <p class="badge" style="margin: 0;">Run goals</p>
-            <small class="muted">Daily-style objectives to encourage varied runs.</small>
+
+      <section class="game-shell">
+        <div class="play-area" id="play-area">
+          <div class="tip-float">Tap anywhere to drop the moving furniture.</div>
+          <div class="rail" data-rail></div>
+          <div class="ground"></div>
+          <div class="attract" data-attract>
+            <div>
+              <p class="badge">Attract mode</p>
+              <h3>Tap to start stacking</h3>
+              <p class="muted">The game will auto-drop pieces to demo if idle for 30s.</p>
+            </div>
           </div>
-          <ul id="mission-list" class="missions" style="margin: 0.5rem 0 0 1rem; display: grid; gap: 0.3rem;"></ul>
+        </div>
+        <div class="panel">
+          <div class="card-body">
+            <p class="badge">How to play</p>
+            <ul style="margin: 0.4rem 0 0 1rem;">
+              <li>Drop the moving piece so it overlaps the one below.</li>
+              <li>Less than 10% overlap ends the run. Perfect fits glow.</li>
+              <li>Speed ramps every 5 layers. Try to beat your best height.</li>
+              <li>Touch anywhere on the play area to drop — kiosk friendly.</li>
+            </ul>
+          </div>
         </div>
       </section>
     </main>
@@ -353,463 +291,303 @@
     </div>
 
     <script>
-      const track = document.getElementById('track');
+      const playArea = document.getElementById('play-area');
+      const rail = document.querySelector('[data-rail]');
       const statusEl = document.querySelector('[data-status]');
-      const distanceEl = document.querySelector('[data-distance]');
-      const energyEl = document.querySelector('[data-energy]');
-      const bestEl = document.querySelector('[data-best]');
-      const tutorialOverlay = document.querySelector('[data-tutorial]');
-      const summaryOverlay = document.querySelector('[data-summary]');
-      const summaryText = document.querySelector('[data-summary-text]');
-      const summaryDistance = document.querySelector('[data-summary-distance]');
-      const summaryPickups = document.querySelector('[data-summary-pickups]');
-      const summaryBest = document.querySelector('[data-summary-best]');
-      const tipEl = document.querySelector('[data-tip]');
-      const warningEl = document.querySelector('[data-warning]');
-      const paceEl = document.querySelector('[data-pace]');
       const speedEl = document.querySelector('[data-speed]');
-      const comboEl = document.querySelector('[data-combo]');
-      const buffEl = document.querySelector('[data-buff]');
-      const missionList = document.getElementById('mission-list');
-      const energyBar = document.createElement('div');
-      energyBar.className = 'hud-progress';
-      energyBar.innerHTML = '<span style="width: 100%"></span>';
-      energyEl.parentElement?.appendChild(energyBar);
+      const perfectEl = document.querySelector('[data-perfect]');
+      const warningEl = document.querySelector('[data-warning]');
+      const heightEl = document.querySelector('[data-height]');
+      const bestEl = document.querySelector('[data-best]');
+      const overlapEl = document.querySelector('[data-overlap]');
+      const logEl = document.querySelector('[data-log]');
+      const attractEl = document.querySelector('[data-attract]');
 
-      let runnerEl = null;
-      let runnerY = 0;
-      let velocity = 0;
-      let gravity = -0.55;
-      let isRunning = false;
-      let distance = 0;
-      let energy = 100;
-      let best = Number(localStorage.getItem('fd-rug-best') || 0);
-      let objects = [];
-      let tickId = null;
-      let difficultyTier = 1;
-      let startTime = 0;
-      let speed = 1;
-      let jumpsAvailable = 2;
-      let lastGroundedTime = 0;
-      const coyoteWindow = 140;
-      const keysDown = new Set();
-      let sliding = false;
-      let slideCooldown = false;
-      let slideBoostTimer = 0;
-      let pickups = 0;
-      let combo = 0;
-      let bestCombo = 0;
-      let hitCount = 0;
-      let nearMisses = 0;
-      let graceTimer = 0;
-      let nextBuffAt = 60;
-      let activeBuff = null;
-      let buffTimer = 0;
-      let lastHitTime = 0;
-      let tierTimes = {};
-      let obstacleStreak = 0;
-      let lastTickTime = 0;
+      const furnitureNames = ['Couch', 'Loveseat', 'Ottoman', 'Mattress', 'Dresser'];
+      const areaWidth = 320;
+      const blockHeight = 36;
+      const startSpeed = 60; // px per second
+      const speedStep = 8;
+      const perfectSnap = 6;
+      const minOverlapRatio = 0.1;
+      const attractDelay = 30000;
 
-      function renderMissions() {
-        const saved = JSON.parse(localStorage.getItem('fd-rug-missions') || '{}');
-        missionList.innerHTML = '';
-        missions.forEach((mission) => {
-          const completed = mission.check() || saved[mission.id];
-          if (completed) {
-            saved[mission.id] = true;
-          }
-          const li = document.createElement('li');
-          li.textContent = mission.text;
-          if (completed) {
-            li.innerHTML = `✅ ${mission.text} <small>(done)</small>`;
-          }
-          missionList.appendChild(li);
-        });
-        localStorage.setItem('fd-rug-missions', JSON.stringify(saved));
-      }
+      let stack = [];
+      let current = null;
+      let direction = 1;
+      let speed = startSpeed;
+      let height = 0;
+      let best = Number(localStorage.getItem('fd-stacker-best') || 0);
+      let perfectStreak = 0;
+      let lastTime = 0;
+      let gameState = 'idle'; // idle, running, dropping, gameover
+      let idleTimer = null;
+      let demoTimer = null;
 
-      const patterns = [
-        [{ type: 'obstacle' }],
-        [{ type: 'pickup' }],
-        [
-          { type: 'pickup', height: 88 },
-          { type: 'obstacle', height: 22 },
-        ],
-        [
-          { type: 'obstacle', height: 22 },
-          { type: 'pickup', height: 88 },
-        ],
-        [
-          { type: 'pickup', height: 88 },
-          { type: 'pickup', height: 120 },
-        ],
-        [
-          { type: 'obstacle', height: 22 },
-          { type: 'obstacle', height: 40 },
-        ],
-        [
-          { type: 'pickup', height: 88 },
-          { type: 'obstacle', height: 32, moving: true },
-          { type: 'pickup', height: 70 },
-        ],
-      ];
+      const sounds = {
+        thunk: new Audio('https://assets.mixkit.co/active_storage/sfx/2104/2104-preview.mp3'),
+        chime: new Audio('https://assets.mixkit.co/active_storage/sfx/2851/2851-preview.mp3'),
+      };
+      Object.values(sounds).forEach((audio) => {
+        audio.volume = 0.35;
+      });
 
-      const missions = [
-        {
-          id: 'mission-distance',
-          text: 'Survive past Pace 3 (60s).',
-          check: () => difficultyTier >= 3,
-        },
-        {
-          id: 'mission-combo',
-          text: 'Hit a 4x pickup chain.',
-          check: () => bestCombo >= 4,
-        },
-        {
-          id: 'mission-buffs',
-          text: 'Trigger a buff pickup.',
-          check: () => Boolean(localStorage.getItem('fd-rug-buff-hit')),
-        },
-      ];
-
-      function renderRunner() {
-        if (!runnerEl) {
-          runnerEl = document.createElement('div');
-          runnerEl.className = 'runner';
-          runnerEl.textContent = '🏃‍♂️';
-          track.appendChild(runnerEl);
-        }
-        runnerEl.style.bottom = `${22 + runnerY}px`;
-      }
-
-      function spawnPattern(pattern = [{ type: 'obstacle' }]) {
-        warningEl.style.display = 'block';
-        warningEl.textContent = 'Incoming pattern…';
-        setTimeout(() => {
-          warningEl.style.display = 'none';
-        }, 900);
-        pattern.forEach((config, idx) => {
-          const { type, height = type === 'pickup' ? 88 : 22, moving = false } = config;
-          const item = document.createElement('div');
-          item.className = type;
-          item.classList.add(type === 'obstacle' ? 'obstacle' : 'pickup');
-          item.style.left = `${100 + idx * 18}%`;
-          item.style.bottom = `${height}px`;
-          item.textContent = type === 'pickup' ? '+10' : moving ? 'Mover' : 'Crate';
-          if (moving) {
-            item.dataset.moving = '1';
-          }
-          track.appendChild(item);
-          objects.push({ el: item, type, warned: false });
-        });
-      }
-
-      function updateHUD() {
-        distanceEl.textContent = `${distance.toFixed(1)}m`;
-        energyEl.textContent = `${energy.toFixed(0)}%`;
-        const clamped = Math.max(0, Math.min(120, energy));
-        const span = energyBar.querySelector('span');
-        span.style.width = `${clamped}%`;
-        span.classList.toggle('low', energy < 25);
-        bestEl.textContent = `${best.toFixed(1)}m`;
-        paceEl.textContent = `Pace ${difficultyTier}`;
-        speedEl.textContent = `Speed x${speed.toFixed(2)}`;
-        comboEl.textContent = `Combo ${combo}x`;
-        comboEl.style.opacity = combo > 0 ? 1 : 0.5;
-        buffEl.style.display = activeBuff ? 'inline-flex' : 'none';
-        buffEl.textContent = activeBuff ? `${activeBuff.toUpperCase()} • ${Math.ceil(buffTimer / 60)}s` : '';
-      }
-
-      function jump() {
-        if (!isRunning) return;
-        const now = performance.now();
-        const canCoyote = jumpsAvailable === 2 && now - lastGroundedTime < coyoteWindow;
-        if (jumpsAvailable <= 0 && !canCoyote) return;
-        if (sliding) {
-          sliding = false;
-          runnerEl?.classList.remove('slide');
-        }
-        velocity = jumpsAvailable === 2 || canCoyote ? 9.5 : 8.4;
-        runnerEl?.classList.add('jump');
-        setTimeout(() => runnerEl?.classList.remove('jump'), 200);
-        statusEl.textContent = jumpsAvailable === 2 || canCoyote ? 'Jump!' : 'Double jump!';
-        if (jumpsAvailable === 1 && !canCoyote) {
-          energy = Math.max(0, energy - 2);
-        }
-        if (!canCoyote) {
-          jumpsAvailable -= 1;
+      function log(message) {
+        const li = document.createElement('li');
+        const now = new Date();
+        li.textContent = `${now.toLocaleTimeString()} — ${message}`;
+        logEl.prepend(li);
+        while (logEl.children.length > 8) {
+          logEl.lastChild.remove();
         }
       }
 
-      function slide() {
-        if (!isRunning || sliding || slideCooldown) return;
-        sliding = true;
-        slideCooldown = true;
-        runnerEl?.classList.add('slide');
-        statusEl.textContent = 'Slide!';
-        slideBoostTimer = 120;
-        setTimeout(() => {
-          sliding = false;
-          runnerEl?.classList.remove('slide');
-        }, 600);
-        setTimeout(() => {
-          slideCooldown = false;
-        }, 900);
-      }
-
-      function reset() {
-        objects.forEach((o) => o.el.remove());
-        objects = [];
-        runnerY = 0;
-        velocity = 0;
-        distance = 0;
-        energy = 100;
-        isRunning = false;
-        difficultyTier = 1;
-        speed = 1;
-        jumpsAvailable = 2;
-        lastGroundedTime = performance.now();
-        sliding = false;
-        slideCooldown = false;
-        slideBoostTimer = 0;
-        pickups = 0;
-        combo = 0;
-        bestCombo = Number(localStorage.getItem('fd-rug-combo') || 0);
-        hitCount = 0;
-        nearMisses = 0;
-        graceTimer = 0;
-        nextBuffAt = 60;
-        activeBuff = null;
-        buffTimer = 0;
-        lastHitTime = 0;
-        tierTimes = {};
-        obstacleStreak = 0;
-        statusEl.textContent = 'Reset. Start sprint to run again.';
+      function resetState() {
+        stack = [];
+        current = null;
+        direction = 1;
+        speed = startSpeed;
+        height = 0;
+        perfectStreak = 0;
+        gameState = 'idle';
+        lastTime = 0;
+        rail.innerHTML = '';
         warningEl.style.display = 'none';
-        updateHUD();
-        renderRunner();
-        if (tickId) cancelAnimationFrame(tickId);
-        tickId = null;
-        summaryOverlay.classList.remove('active');
-        runnerEl?.classList.remove('slide', 'hit');
+        perfectEl.textContent = 'Perfect streak: 0';
+        overlapEl.textContent = '–';
+        updateBadges();
       }
 
-      function start() {
-        reset();
-        isRunning = true;
-        statusEl.textContent = 'Sprint live!';
-        startTime = performance.now();
-        lastTickTime = startTime;
-        tierTimes = { 1: 0 };
-        localStorage.setItem('fd-rug-tutorial', 'seen');
-        loop();
+      function placeBase() {
+        const baseWidth = 200;
+        const x = (areaWidth - baseWidth) / 2;
+        const block = makeBlock(x, blockHeight / 2, baseWidth, 'Base', true);
+        stack.push({ x, width: baseWidth, y: blockHeight / 2, el: block });
+        rail.appendChild(block);
+        height = 1;
+        updateHeight();
       }
 
-      function loop() {
-        if (!isRunning) return;
-        const now = performance.now();
-        const delta = Math.min((now - lastTickTime) / 16.67 || 1, 2);
-        lastTickTime = now;
-        velocity += gravity * delta;
-        if (keysDown.has('Space') && runnerY > 0) {
-          velocity += 0.08 * delta;
-        }
-        runnerY = Math.max(0, runnerY + velocity * delta);
-        if (runnerY === 0) {
-          velocity = 0;
-          jumpsAvailable = 2;
-          lastGroundedTime = now;
-        }
-        renderRunner();
-        const elapsed = (now - startTime) / 1000;
-        const previousTier = difficultyTier;
-        difficultyTier = 1 + Math.floor(elapsed / 20);
-        tierTimes[difficultyTier] = (tierTimes[difficultyTier] || 0) + delta / 60;
-        speed = 0.9 + (difficultyTier - 1) * 0.18 + (combo >= 3 ? 0.04 : 0) + (slideBoostTimer > 0 ? 0.12 : 0);
-        if (slideBoostTimer > 0) slideBoostTimer -= delta;
-        distance += 0.24 * speed * delta;
-        let drain = (0.03 + difficultyTier * 0.005) * speed * delta;
-        if (combo >= 3) drain -= 0.012 * Math.min(combo, 5) * delta;
-        if (hitCount === 0 && elapsed > 15) drain *= 0.92;
-        energy = Math.max(0, Math.min(130, energy - drain));
-        tipEl.textContent = `Pace ${difficultyTier} • Speed x${speed.toFixed(2)} • Combo ${combo}x${activeBuff ? ` • ${activeBuff}` : ''}`;
+      function makeBlock(x, centerY, width, label, isBase = false) {
+        const block = document.createElement('div');
+        block.className = `block ${isBase ? 'base' : 'furniture'}`;
+        block.style.width = `${width}px`;
+        block.style.left = `${x}px`;
+        block.style.bottom = `${centerY - blockHeight / 2}px`;
+        block.textContent = label;
+        return block;
+      }
 
-        if (distance >= nextBuffAt && !activeBuff) {
-          activeBuff = previousTier % 2 === 0 ? 'shield' : 'magnet';
-          buffTimer = 600;
-          nextBuffAt += 60;
-          localStorage.setItem('fd-rug-buff-hit', '1');
-          statusEl.textContent = `Buff gained: ${activeBuff}!`;
+      function spawnPiece() {
+        const prev = stack[stack.length - 1];
+        const name = furnitureNames[(stack.length - 1) % furnitureNames.length];
+        const widthDelta = Math.random() * 10 - 5;
+        const width = Math.max(60, Math.min(220, prev.width + widthDelta));
+        const startX = Math.random() > 0.5 ? 12 : areaWidth - width - 12;
+        direction = startX < areaWidth / 2 ? 1 : -1;
+        const y = prev.y + blockHeight;
+        current = { x: startX, y, width, el: makeBlock(startX, y, width, name) };
+        rail.appendChild(current.el);
+        gameState = 'running';
+        statusEl.textContent = `${name} sliding — tap to drop`;
+        log(`New ${name} ready.`);
+        updateSpeedLabel();
+      }
+
+      function updateHeight() {
+        heightEl.textContent = height;
+        best = Math.max(best, height);
+        bestEl.textContent = best;
+        localStorage.setItem('fd-stacker-best', String(best));
+        const lift = Math.max(0, (height - 8) * (blockHeight / 2));
+        rail.style.transform = `translateY(${lift}px)`;
+      }
+
+      function updateBadges() {
+        perfectEl.textContent = `Perfect streak: ${perfectStreak}`;
+        updateSpeedLabel();
+      }
+
+      function updateSpeedLabel() {
+        const tier = Math.floor((height - 1) / 5) + 1;
+        speedEl.textContent = `Pace ${Math.max(1, tier)} · ${speed.toFixed(0)}px/s`;
+      }
+
+      function startGame() {
+        resetState();
+        placeBase();
+        spawnPiece();
+        warningEl.style.display = 'none';
+        height = stack.length;
+        updateHeight();
+        statusEl.textContent = 'Stacking — time your drop!';
+        log('Run started.');
+        lastTime = performance.now();
+        requestAnimationFrame(tick);
+        attractEl.classList.remove('active');
+        clearIdle();
+      }
+
+      function tick(timestamp) {
+        if (gameState === 'gameover' || !current) return;
+        const delta = (timestamp - lastTime) / 1000;
+        lastTime = timestamp;
+
+        if (gameState === 'running') {
+          current.x += direction * speed * delta;
+          if (current.x <= 8) {
+            current.x = 8;
+            direction = 1;
+          }
+          if (current.x + current.width >= areaWidth - 8) {
+            current.x = areaWidth - current.width - 8;
+            direction = -1;
+          }
+          current.el.style.left = `${current.x}px`;
         }
-        if (activeBuff) {
-          buffTimer -= 1;
-          if (buffTimer <= 0) {
-            activeBuff = null;
+
+        requestAnimationFrame(tick);
+      }
+
+      function dropPiece(auto = false) {
+        if (!current || gameState !== 'running') return;
+        gameState = 'dropping';
+        clearIdle();
+        const prev = stack[stack.length - 1];
+        const overlapLeft = Math.max(prev.x, current.x);
+        const overlapRight = Math.min(prev.x + prev.width, current.x + current.width);
+        const overlapWidth = overlapRight - overlapLeft;
+        const overlapRatio = overlapWidth / prev.width;
+
+        if (overlapWidth <= 0 || overlapRatio < minOverlapRatio) {
+          warningEl.style.display = 'inline-block';
+          statusEl.textContent = 'Game over — too little overlap!';
+          log('Game over.');
+          gameState = 'gameover';
+          overlapEl.textContent = '0%';
+          return;
+        }
+
+        const trimmedLeft = overlapLeft !== current.x;
+        const trimmedRight = overlapRight !== current.x + current.width;
+        if (trimmedLeft || trimmedRight) {
+          makeScrap(trimmedLeft ? current.x : overlapRight, current.y, Math.abs(current.x - overlapLeft));
+          makeScrap(trimmedRight ? overlapRight : current.x, current.y, Math.abs(overlapRight - (current.x + current.width)));
+        }
+
+        current.x = overlapLeft;
+        current.width = overlapWidth;
+        current.el.style.left = `${current.x}px`;
+        current.el.style.width = `${overlapWidth}px`;
+        current.el.style.bottom = `${current.y - blockHeight / 2}px`;
+
+        const name = current.el.textContent || 'Piece';
+        const overlapPct = Math.round((overlapWidth / prev.width) * 100);
+        overlapEl.textContent = `${overlapPct}%`;
+        statusEl.textContent = `Dropped ${name}: ${overlapPct}% overlap.`;
+        log(`Dropped ${name}: ${overlapPct}% overlap.`);
+
+        const perfect = Math.abs(current.x - prev.x) < perfectSnap;
+        if (perfect) {
+          current.el.classList.add('perfect');
+          perfectStreak += 1;
+          sounds.chime.play().catch(() => {});
+          statusEl.textContent = `Perfect fit! (${perfectStreak}x)`;
+          log('Perfect fit!');
+        } else {
+          perfectStreak = 0;
+        }
+
+        sounds.thunk.play().catch(() => {});
+
+        stack.push({ x: current.x, width: current.width, y: current.y, el: current.el });
+        height = stack.length;
+        updateHeight();
+        updateBadges();
+        adjustSpeed();
+        current = null;
+        spawnPiece();
+        gameState = 'running';
+        if (auto) scheduleIdle();
+      }
+
+      function adjustSpeed() {
+        const tier = Math.floor((height - 1) / 5);
+        speed = startSpeed + tier * speedStep;
+      }
+
+      function makeScrap(x, y, width) {
+        if (width <= 2) return;
+        const scrap = document.createElement('div');
+        scrap.className = 'block scrap';
+        scrap.style.width = `${width}px`;
+        scrap.style.left = `${x}px`;
+        scrap.style.bottom = `${y - blockHeight / 2}px`;
+        rail.appendChild(scrap);
+        setTimeout(() => scrap.remove(), 900);
+      }
+
+      function clearIdle() {
+        clearTimeout(idleTimer);
+        clearTimeout(demoTimer);
+      }
+
+      function scheduleIdle() {
+        clearIdle();
+        idleTimer = setTimeout(() => {
+          attractEl.classList.add('active');
+          demoTimer = setTimeout(runDemo, 2000);
+        }, attractDelay);
+      }
+
+      function runDemo() {
+        if (gameState === 'gameover') return;
+        if (gameState === 'idle') startGame();
+        if (current && gameState === 'running') {
+          // Drop when roughly centered for a forgiving demo.
+          if (Math.abs(current.x - (areaWidth - current.width) / 2) < 8) {
+            dropPiece(true);
+          } else {
+            requestAnimationFrame(runDemo);
           }
         }
+      }
 
-        const spawnChance = graceTimer > 0 ? 0.012 : Math.min(0.04 + difficultyTier * 0.008, 0.1);
-        if (graceTimer > 0) {
-          graceTimer -= delta;
-        }
-        if (Math.random() < spawnChance * delta) {
-          let pattern = patterns[Math.floor(Math.random() * patterns.length)];
-          if (obstacleStreak >= 2) {
-            pattern = patterns.find((p) => p.some((slot) => slot.type === 'pickup')) || pattern;
-            obstacleStreak = 0;
-          }
-          const hasObstacle = pattern.some((slot) => slot.type === 'obstacle');
-          obstacleStreak = hasObstacle ? obstacleStreak + 1 : 0;
-          spawnPattern(pattern);
-        }
+      function preventScroll(event) {
+        event.preventDefault();
+      }
 
-        const runnerBox = runnerEl.getBoundingClientRect();
-
-        objects.forEach((obj) => {
-          const left = (parseFloat(obj.el.style.left) || 100) - (1.1 + speed * 0.45) * delta;
-          obj.el.style.left = `${left}%`;
-          if (obj.el.dataset.moving === '1') {
-            const wobble = Math.sin(now / 240 + left) * 8;
-            obj.el.style.bottom = `${Math.max(18, 32 + wobble)}px`;
-          }
-          if (activeBuff === 'magnet' && obj.type === 'pickup') {
-            const targetBottom = 22 + runnerY + 12;
-            const currentBottom = parseFloat(obj.el.style.bottom) || 22;
-            obj.el.style.bottom = `${currentBottom + (targetBottom - currentBottom) * 0.08}px`;
-            obj.el.style.left = `${left - 0.35 * delta}%`;
+      function bindControls() {
+        document.querySelector('[data-action="start"]').addEventListener('click', startGame);
+        document.querySelector('[data-action="drop"]').addEventListener('click', () => dropPiece());
+        document.querySelector('[data-action="reset"]').addEventListener('click', startGame);
+        document.querySelector('[data-action="hub"]').addEventListener('click', () => {
+          window.location.href = '../../index.html';
+        });
+        playArea.addEventListener('pointerdown', () => {
+          dropPiece();
+        });
+        ['touchmove', 'gesturestart'].forEach((evt) => {
+          playArea.addEventListener(evt, preventScroll, { passive: false });
+        });
+        window.addEventListener('keydown', (e) => {
+          if (e.code === 'Space' || e.code === 'Enter') {
+            e.preventDefault();
+            dropPiece();
           }
         });
-        objects = objects.filter((obj) => {
-          const left = parseFloat(obj.el.style.left);
-          if (left < -10) {
-            obj.el.remove();
-            return false;
-          }
-          const objBox = obj.el.getBoundingClientRect();
-          const collides =
-            runnerBox.left < objBox.right &&
-            runnerBox.right > objBox.left &&
-            runnerBox.top < objBox.bottom &&
-            runnerBox.bottom > objBox.top;
-          const nearMissZone =
-            obj.type === 'obstacle' &&
-            !collides &&
-            objBox.left < runnerBox.right + 8 &&
-            objBox.right > runnerBox.left - 8;
-          if (collides) {
-            if (obj.type === 'pickup') {
-              distance += 3 + combo * 0.5;
-              energy = Math.min(130, energy + 12);
-              pickups += 1;
-              combo += 1;
-              obstacleStreak = 0;
-              bestCombo = Math.max(bestCombo, combo);
-              localStorage.setItem('fd-rug-combo', String(bestCombo));
-              statusEl.textContent = combo > 1 ? `Decor chain x${combo}!` : 'Decor snagged!';
-            } else {
-              if (activeBuff === 'shield') {
-                activeBuff = null;
-                statusEl.textContent = 'Shield blocked the hit!';
-              } else {
-                energy -= sliding ? 5 : 18;
-                statusEl.textContent = sliding ? 'Glancing blow while sliding.' : 'Ouch! Crate collision.';
-                runnerEl?.classList.add('hit');
-                track.classList.add('shake');
-                setTimeout(() => track.classList.remove('shake'), 400);
-                setTimeout(() => runnerEl?.classList.remove('hit'), 350);
-                combo = 0;
-                hitCount += 1;
-                graceTimer = 70;
-                lastHitTime = now;
-              }
-              obstacleStreak += 1;
-            }
-            obj.el.remove();
-            return false;
-          } else if (nearMissZone && !obj.warned) {
-            nearMisses += 1;
-            statusEl.textContent = 'Close dodge!';
-            obj.warned = true;
-          }
-          return true;
-        });
-
-        if (energy <= 0) {
-          isRunning = false;
-          best = Math.max(best, distance);
-          localStorage.setItem('fd-rug-best', best);
-          statusEl.textContent = 'Energy out. Reset to sprint again.';
-          summaryDistance.textContent = `${distance.toFixed(1)}m`;
-          summaryPickups.textContent = `${pickups} pickups (best combo ${bestCombo}x)`;
-          const tiers = Object.entries(tierTimes)
-            .map(([tier, frames]) => `P${tier}: ${frames.toFixed(1)}s`)
-            .join(' · ');
-          summaryBest.textContent = `${best.toFixed(1)}m`;
-          summaryText.textContent = `Hits ${hitCount}, near misses ${nearMisses}. ${tiers}. Buffs ${activeBuff ? 'active' : 'spent'}.`;
-          summaryOverlay.classList.add('active');
-        }
-
-        renderMissions();
-        updateHUD();
-        tickId = requestAnimationFrame(loop);
       }
 
-      document.querySelector('[data-action="start"]').addEventListener('click', start);
-      document.querySelector('[data-action="jump"]').addEventListener('click', jump);
-      document.querySelector('[data-action="slide"]').addEventListener('click', slide);
-      document.querySelector('[data-action="reset"]').addEventListener('click', reset);
-      document.querySelector('[data-action="restart"]').addEventListener('click', () => {
-        summaryOverlay.classList.remove('active');
-        start();
-      });
-      document.querySelector('[data-action="share"]').addEventListener('click', async () => {
-        const shareText = `I sprinted ${distance.toFixed(1)}m in Rug Runner with a ${bestCombo}x decor combo!`;
-        if (navigator.share) {
-          await navigator.share({ text: shareText, title: 'Rug Runner score' });
-        } else if (navigator.clipboard) {
-          await navigator.clipboard.writeText(shareText);
-          statusEl.textContent = 'Copied score to clipboard!';
-        }
-      });
-      document.querySelector('[data-action="begin"]').addEventListener('click', () => {
-        tutorialOverlay.classList.remove('active');
-        start();
-      });
-      document.querySelector('[data-action="skip-tutorial"]').addEventListener('click', () => {
-        localStorage.setItem('fd-rug-tutorial', 'seen');
-        tutorialOverlay.classList.remove('active');
-        statusEl.textContent = 'Tutorial skipped. Start sprint to play!';
-      });
-      document
-        .querySelector('[data-action="replay-tutorial"]')
-        .addEventListener('click', () => {
-          summaryOverlay.classList.remove('active');
-          tutorialOverlay.classList.add('active');
-        });
-      document.addEventListener('keydown', (e) => {
-        keysDown.add(e.code);
-        if (e.code === 'Space') {
-          e.preventDefault();
-          jump();
-        } else if (e.code === 'ArrowUp' || e.code === 'KeyW') {
-          jump();
-        } else if (e.code === 'ArrowDown' || e.code === 'KeyS') {
-          slide();
-        }
-      });
-
-      document.addEventListener('keyup', (e) => {
-        keysDown.delete(e.code);
-      });
-
-      bestCombo = Number(localStorage.getItem('fd-rug-combo') || 0);
-      if (!localStorage.getItem('fd-rug-tutorial')) {
-        tutorialOverlay.classList.add('active');
+      function init() {
+        bestEl.textContent = best;
+        bindControls();
+        resetState();
+        placeBase();
+        statusEl.textContent = 'Idle — tap start to begin.';
+        scheduleIdle();
       }
 
-      renderRunner();
-      renderMissions();
-      updateHUD();
+      init();
     </script>
   </body>
 </html>
