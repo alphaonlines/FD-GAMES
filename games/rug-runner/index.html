@@ -252,6 +252,44 @@
       </section>
     </main>
 
+    <div class="overlay" data-tutorial>
+      <div class="card solid" style="max-width: 520px;">
+        <div class="card-body">
+          <p class="badge">Quick tutorial</p>
+          <h3>Jump, slide, and chain décor pickups</h3>
+          <ul style="margin: 0.5rem 0 1rem 1rem;">
+            <li>Space/W/↑ to jump. Tap twice for a double-jump.</li>
+            <li>S/↓ to slide under low crates. Short cooldown keeps timing tight.</li>
+            <li>Pickups refill energy; chaining them builds a combo meter for bonus distance.</li>
+          </ul>
+          <div class="controls">
+            <button class="btn" data-action="begin">Start run</button>
+            <button class="btn outline" data-action="skip-tutorial">Skip next time</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary" data-summary>
+      <div class="card solid" style="max-width: 520px;">
+        <div class="card-body">
+          <p class="badge">Run complete</p>
+          <h3>Nice sprint!</h3>
+          <p data-summary-text></p>
+          <div class="hud" style="margin-top: 0.5rem;">
+            <div class="stat"><span>Distance</span><strong data-summary-distance>0m</strong></div>
+            <div class="stat"><span>Pickups</span><strong data-summary-pickups>0</strong></div>
+            <div class="stat"><span>Best</span><strong data-summary-best>0m</strong></div>
+          </div>
+          <div class="controls" style="margin-top: 0.75rem;">
+            <button class="btn" data-action="restart">Restart</button>
+            <button class="btn secondary" data-action="share">Share score</button>
+            <button class="btn outline" data-action="replay-tutorial">Replay tutorial</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script>
       const playArea = document.getElementById('play-area');
       const rail = document.querySelector('[data-rail]');
