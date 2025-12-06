@@ -18,6 +18,7 @@ This folder packages design briefs and quick-start notes for each FD Games conce
 - [x] Rug Runner
 - [x] Build-a-Room: Before/After
 - [x] Sofa Tetris
+- [x] Couch Catapult
 
 ## Game briefs
 Each subfolder contains a README with:
